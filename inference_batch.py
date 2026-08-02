@@ -133,8 +133,13 @@ if __name__ == '__main__':
     comp_device = torch.device('cuda:0')
     args = option_trans.get_args_parser()
 
-    pipe = construct_llama(args.rewrite_model_path)
-    
+    if args.use_rewrite_model and args.rewrite_model_path:
+        pipe = construct_llama(args.rewrite_model_path)
+    else:
+        if args.use_rewrite_model:
+            print('--rewrite_model_path is not set, skipping the rewrite model')
+        pipe = None
+
     # load clip model
     if args.text_encode == 'clip':
         clip_model, clip_preprocess = clip.load("ViT-B/32", device=comp_device, jit=False)  # Must set jit=False for training
@@ -143,8 +148,8 @@ if __name__ == '__main__':
         for p in clip_model.parameters():
             p.requires_grad = False
     elif args.text_encode == 'flan-t5-xl':
-        tokenizer = T5Tokenizer.from_pretrained('checkpoints/models--google--flan-t5-xl/snapshots/7d6315df2c2fb742f0f5b556879d730926ca9001', local_files_only=True)
-        text_encoder = T5EncoderModel.from_pretrained('checkpoints/models--google--flan-t5-xl/snapshots/7d6315df2c2fb742f0f5b556879d730926ca9001', local_files_only=True).to(device=comp_device)
+        tokenizer = T5Tokenizer.from_pretrained('checkpoints/flan-t5-xl', local_files_only=True)
+        text_encoder = T5EncoderModel.from_pretrained('checkpoints/flan-t5-xl', local_files_only=True).to(device=comp_device)
         clip_model = (tokenizer, text_encoder)
         clip_model[1].eval()
         for p in clip_model[1].parameters():
@@ -218,7 +223,7 @@ if __name__ == '__main__':
         
         output_root = os.path.join(basic_root, str(sub_dir_list[-1] + 1))
         os.makedirs(output_root, exist_ok=True)
-        if args.use_rewrite_model:
+        if pipe is not None:
             try:
                 rewrite_text = call_llama_rewrite(pipe, ori_input_text)
                 input_text_list = [rewrite_text, ori_input_text]

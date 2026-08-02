@@ -211,8 +211,13 @@ if __name__ == '__main__':
     
     args = option_trans.get_args_parser()
 
-    pipe = construct_llama(args.rewrite_model_path)
-    
+    if args.use_rewrite_model and args.rewrite_model_path:
+        pipe = construct_llama(args.rewrite_model_path)
+    else:
+        if args.use_rewrite_model:
+            print('--rewrite_model_path is not set, skipping the rewrite model')
+        pipe = None
+
     if args.text_encode == 'clip':
         clip_model, clip_preprocess = clip.load("ViT-B/32", device=comp_device, jit=False)  # Must set jit=False for training
         clip.model.convert_weights(clip_model)  # Actually this line is unnecessary since clip by default already on float16
@@ -220,8 +225,8 @@ if __name__ == '__main__':
         for p in clip_model.parameters():
             p.requires_grad = False
     elif args.text_encode == 'flan-t5-xl':
-        tokenizer = T5Tokenizer.from_pretrained('checkpoints/models--google--flan-t5-xl/snapshots/7d6315df2c2fb742f0f5b556879d730926ca9001', local_files_only=True)
-        text_encoder = T5EncoderModel.from_pretrained('checkpoints/models--google--flan-t5-xl/snapshots/7d6315df2c2fb742f0f5b556879d730926ca9001', local_files_only=True).to(device=comp_device)
+        tokenizer = T5Tokenizer.from_pretrained('checkpoints/flan-t5-xl', local_files_only=True)
+        text_encoder = T5EncoderModel.from_pretrained('checkpoints/flan-t5-xl', local_files_only=True).to(device=comp_device)
         clip_model = (tokenizer, text_encoder)
         clip_model[1].eval()
         for p in clip_model[1].parameters():
@@ -288,7 +293,7 @@ if __name__ == '__main__':
     
     while True:
         ori_input_text = input('Input text: ')
-        if args.use_rewrite_model:
+        if pipe is not None:
             rewrite_text = call_llama_rewrite(pipe, ori_input_text)
             print(f"Rewrite text is: {rewrite_text}")
             input_text_list = [rewrite_text, ori_input_text]
