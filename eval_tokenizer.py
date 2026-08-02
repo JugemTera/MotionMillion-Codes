@@ -34,6 +34,10 @@ elif args.dataname == 't2m':
     args.nb_joints = 22
 elif args.dataname == 'motionmillion':
     args.nb_joints = 22
+elif args.dataname == 'romo':
+    args.nb_joints = 22
+else:
+    raise KeyError(f'Dataset Does not Exists: {args.dataname}')
 
 train_loader, train_mean, train_std = dataset_VQ.DATALoader(args.dataname,
                                         args.batch_size,

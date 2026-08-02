@@ -70,6 +70,7 @@ def get_args_parser():
     parser.add_argument('--motion_type', type=str, default='vector_263', help='motion type')
     parser.add_argument('--text_type', type=str, default='texts', help='text type')
     parser.add_argument('--version', type=str, default='version1', help='version')
+    parser.add_argument('--eval-version', type=str, default='', help='split version used by the validation loader; falls back to --version when empty')
     parser.add_argument('--num-workers', type=int, default=40, help='number of workers')
     
     # visualization

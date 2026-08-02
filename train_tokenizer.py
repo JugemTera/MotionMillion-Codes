@@ -55,6 +55,11 @@ elif args.dataname == 't2m':
 elif args.dataname == 'motionmillion':
     dataset_opt_path = 'checkpoints/t2m/Comp_v6_KLD005/opt.txt'
     args.nb_joints = 22
+elif args.dataname == 'romo':
+    dataset_opt_path = 'checkpoints/t2m/Comp_v6_KLD005/opt.txt'
+    args.nb_joints = 22
+else:
+    raise KeyError(f'Dataset Does not Exists: {args.dataname}')
 
 
 logger.info(f'Training on {args.dataname}, motions are with {args.nb_joints} joints')
@@ -76,7 +81,7 @@ val_loader, test_mean, test_std = dataset_TM_eval.MotionMillionFSQDATALoader(arg
                                         32,
                                         w_vectorizer,
                                         unit_length=2**args.down_t,
-                                        version=args.version)
+                                        version=args.eval_version or args.version)
 
 ##### ---- Network ---- #####
 net = vqvae.HumanVQVAE(args, ## use args to define different parameters in different quantizers

@@ -48,10 +48,20 @@ class VQMotionDatasetEval(data.Dataset):
             mean = np.load(pjoin(self.data_root, 'mean_std', self.motion_type, 'mean.npy'))
             std = np.load(pjoin(self.data_root, 'mean_std', self.motion_type, 'std.npy'))
             split_file = pjoin(self.data_root, 'split', self.version, split + '.txt')
-            
+
+        elif dataset_name == 'romo':
+            self.data_root = './dataset/RoMo-272'
+            self.motion_dir = pjoin(self.data_root, 'motion_data', self.motion_type)
+            self.text_dir = pjoin(self.data_root, self.text_type)
+            self.joints_num = 22
+            self.max_motion_length = 300
+            mean = np.load(pjoin(self.data_root, 'mean_std', self.motion_type, 'mean.npy'))
+            std = np.load(pjoin(self.data_root, 'mean_std', self.motion_type, 'std.npy'))
+            split_file = pjoin(self.data_root, 'split', self.version, split + '.txt')
+
         else:
             raise KeyError('Dataset Does not Exists')
-        
+
         joints_num = self.joints_num
         id_list = []
         
@@ -148,9 +158,17 @@ class VQMotionDataset(data.Dataset):
             mean = np.load(pjoin(self.data_root, 'mean_std', self.motion_type, 'mean.npy'))
             std = np.load(pjoin(self.data_root, 'mean_std', self.motion_type, 'std.npy'))
             split_file = pjoin(self.data_root, 'split', self.version, split + '.txt')
+        elif dataset_name == 'romo':
+            self.data_root = './dataset/RoMo-272'
+            self.motion_dir = pjoin(self.data_root, 'motion_data', self.motion_type)
+            self.text_dir = pjoin(self.data_root, self.text_type)
+            self.joints_num = 22
+            mean = np.load(pjoin(self.data_root, 'mean_std', self.motion_type, 'mean.npy'))
+            std = np.load(pjoin(self.data_root, 'mean_std', self.motion_type, 'std.npy'))
+            split_file = pjoin(self.data_root, 'split', self.version, split + '.txt')
         else:
             raise KeyError('Dataset Does not Exists')
-        
+
         id_list = []
         
         self.id_list = []

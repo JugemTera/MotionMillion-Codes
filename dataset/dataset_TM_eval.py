@@ -76,12 +76,31 @@ class MotionMillionFSQDataset(data.Dataset):
                 split_file = pjoin(self.data_root, 'split', self.version, 'test.txt')
             else:
                 split_file = pjoin(self.data_root, 'split', self.version, 'val.txt')
-            
+        elif dataset_name == 'romo':
+            self.data_root = './dataset/RoMo-272'
+            self.motion_dir = pjoin(self.data_root, 'motion_data', "vector_272")
+            self.text_dir = pjoin(self.data_root, "texts")
+            self.joints_num = 22
+            radius = 4
+            fps = 30
+            self.max_motion_length = 300
+            dim_pose = 272
+            kinematic_chain = paramUtil.t2m_kinematic_chain
+            self.meta_dir = pjoin(self.data_root, 'mean_std', "vector_272")
+            if is_test:
+                split_file = pjoin(self.data_root, 'split', self.version, 'test.txt')
+            else:
+                split_file = pjoin(self.data_root, 'split', self.version, 'val.txt')
+        else:
+            raise KeyError('Dataset Does not Exists')
+
         mean = np.load(pjoin(self.meta_dir, 'mean.npy'))
         std = np.load(pjoin(self.meta_dir, 'std.npy'))
-        
+
         if self.dataset_name == 'motionmillion':
             min_motion_len = 120 # 192
+        elif self.dataset_name == 'romo':
+            min_motion_len = 120
         elif self.dataset_name == 't2m':
             min_motion_len = 40 # 192
         else:
@@ -164,7 +183,7 @@ def MotionMillionFSQDATALoader(dataset_name, is_test,
     val_loader = torch.utils.data.DataLoader( val_dataset, 
                                               batch_size,
                                               shuffle = True,
-                                              num_workers=40, # num_workers,
+                                              num_workers=num_workers,
                                               collate_fn=collate_fn,
                                               drop_last = True,
                                               prefetch_factor=2)
