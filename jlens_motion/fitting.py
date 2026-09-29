@@ -24,7 +24,8 @@ import logging
 import math
 import os
 import time
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Iterable, Sequence
+from typing import Callable, Tuple
 
 import torch
 
@@ -39,7 +40,8 @@ from jlens_motion.model import (
 
 logger = logging.getLogger(__name__)
 
-PositionFn = Callable[[MotionExample], tuple[torch.Tensor, torch.Tensor]]
+# typing aliases: this runs under Python 3.8 (docker-shell/Dockerfile).
+PositionFn = Callable[[MotionExample], Tuple[torch.Tensor, torch.Tensor]]
 
 
 def motion_to_motion(*, skip_first: int = 0) -> PositionFn:
@@ -120,10 +122,8 @@ def jacobian_for_example(
     jacobians = {l: torch.zeros(d_model, d_model, dtype=torch.float32) for l in sources}
 
     idx, clip, y_mask = model.build_inputs(example, batch=dim_batch)
-    with (
-        ActivationRecorder(model.layers, at=[*sources, target], start_graph_at=min(sources)) as rec,
-        torch.enable_grad(),
-    ):
+    recorder = ActivationRecorder(model.layers, at=[*sources, target], start_graph_at=min(sources))
+    with recorder as rec, torch.enable_grad():
         model.forward(idx, clip, y_mask)
         target_act = rec.activations[target]  # [dim_batch, seq_len, d_model]
         source_acts = [rec.activations[l] for l in sources]
@@ -203,10 +203,8 @@ def offset_jacobians_for_example(
     total_passes = len(targets) * n_dim_passes
 
     idx, clip, y_mask = model.build_inputs(example, batch=dim_batch)
-    with (
-        ActivationRecorder(model.layers, at=[*sources, target], start_graph_at=min(sources)) as rec,
-        torch.enable_grad(),
-    ):
+    recorder = ActivationRecorder(model.layers, at=[*sources, target], start_graph_at=min(sources))
+    with recorder as rec, torch.enable_grad():
         model.forward(idx, clip, y_mask)
         target_act = rec.activations[target]
         source_acts = [rec.activations[l] for l in sources]

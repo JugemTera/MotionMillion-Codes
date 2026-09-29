@@ -16,6 +16,8 @@ Modes:
 See jlens_motion/README.md for the definitions and cost.
 """
 
+from __future__ import annotations
+
 import argparse
 import logging
 import os
@@ -105,6 +107,13 @@ def sample_pairs(args) -> list[tuple[str, str, list[int]]]:
         pairs.append((name, rng.choice(captions), [int(c) for c in codes]))
         if len(pairs) == args.n_examples:
             break
+    if not pairs:
+        raise SystemExit(
+            f"no names in {args.split_file} have both captions and codes in all_data.pkl "
+            "(all_data.pkl is built by train_t2m_get_codes.py from its own split file)"
+        )
+    if len(pairs) < args.n_examples:
+        logger.warning("only %d of %d requested examples are available", len(pairs), args.n_examples)
     return pairs
 
 
