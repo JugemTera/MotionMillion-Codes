@@ -193,3 +193,5 @@ ok_ckpts
 job/
 paper/
 motionmillion.sif
+# J-lens fits (hundreds of MB to GB per file)
+results/jlens/
