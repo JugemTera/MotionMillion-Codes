@@ -1,0 +1,398 @@
+<title>MotionMillion 学習パイプライン</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: single reading column (~72ch), figures break out to the full column width, SVG scales by viewBox. */
+  :root {
+    --bg: #f7f6f2;
+    --surface: #ffffff;
+    --fg: #1d2126;
+    --muted: #5d6670;
+    --line: #c9cdd2;
+    --accent: #b5471c;      /* the one hue with meaning: the text→motion boundary */
+    --accent-soft: #f6e3d9;
+    --text-fill: #e4ebf3;   /* text positions */
+    --motion-fill: #e6efe3; /* motion positions */
+    --pad-fill: #ececec;    /* padding / ignored */
+    --font-body: "Noto Sans JP", "Hiragino Sans", "Yu Gothic", sans-serif;
+    --font-mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15181c; --surface: #1e2227; --fg: #e8e9ea; --muted: #9ba3ab; --line: #3b424a;
+      --accent: #f0875a; --accent-soft: #3d2519; --text-fill: #243242; --motion-fill: #233225; --pad-fill: #2a2e33;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #15181c; --surface: #1e2227; --fg: #e8e9ea; --muted: #9ba3ab; --line: #3b424a;
+    --accent: #f0875a; --accent-soft: #3d2519; --text-fill: #243242; --motion-fill: #233225; --pad-fill: #2a2e33;
+    color-scheme: dark;
+  }
+  body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.75; margin: 0; }
+  main { max-width: 880px; margin: 0 auto; padding-block: 40px 72px; padding-inline: 20px; }
+  h1 { font-size: 1.7rem; font-weight: 700; line-height: 1.3; margin: 0 0 8px; text-wrap: balance; }
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 56px 0 12px; padding-top: 16px; border-top: 1px solid var(--line); text-wrap: balance; }
+  p { max-width: 72ch; margin: 0 0 12px; }
+  .lead { color: var(--muted); max-width: 72ch; margin-bottom: 28px; }
+  code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+  code { background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+  figure { margin: 20px 0 28px; }
+  .frame { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px; overflow-x: auto; }
+  svg { display: block; max-width: 100%; height: auto; font-family: var(--font-body); color: var(--fg); }
+  svg .mono { font-family: var(--font-mono); }
+  svg .muted { fill: var(--muted); }
+  svg .lbl { font-size: 12px; fill: var(--fg); }
+  svg .small { font-size: 10.5px; }
+  svg .box { fill: var(--surface); stroke: currentColor; stroke-width: 1.2; }
+  svg .text-pos { fill: var(--text-fill); stroke: currentColor; stroke-width: 1; }
+  svg .motion-pos { fill: var(--motion-fill); stroke: currentColor; stroke-width: 1; }
+  svg .pad-pos { fill: var(--pad-fill); stroke: var(--line); stroke-width: 1; }
+  svg .edge { stroke: currentColor; stroke-width: 1.3; fill: none; }
+  svg .edge-accent { stroke: var(--accent); stroke-width: 1.8; fill: none; }
+  svg .accent-fill { fill: var(--accent); }
+  svg .accent-text { fill: var(--accent); font-weight: 700; }
+  svg .accent-box { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+  figcaption { color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 10px; max-width: 72ch; }
+  ol.steps { padding-left: 1.4em; max-width: 72ch; margin: 0 0 12px; }
+  ol.steps li { margin-bottom: 6px; }
+  table { border-collapse: collapse; width: 100%; max-width: 760px; font-size: 0.92rem; margin: 12px 0 8px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 0.82rem; letter-spacing: 0.04em; }
+  td.mono { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px 22px; font-size: 0.86rem; color: var(--muted); margin: 6px 0 0; }
+  .legend span::before { content: ""; display: inline-block; width: 14px; height: 12px; border: 1px solid var(--fg); vertical-align: -1px; margin-right: 6px; border-radius: 2px; }
+  .legend .t::before { background: var(--text-fill); }
+  .legend .m::before { background: var(--motion-fill); }
+  .legend .p::before { background: var(--pad-fill); border-color: var(--line); }
+  .legend .a::before { background: var(--accent-soft); border-color: var(--accent); }
+  .src { color: var(--muted); font-size: 0.82rem; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<main>
+  <h1>MotionMillion 学習パイプライン</h1>
+  <p class="lead">テキストからモーションを生成する LLaMA（3B / 7B）が、どんな入力列を受け取り、何を予測するように学習されているか。リポジトリの実コード（<span class="mono">train_t2m_get_codes.py</span>、<span class="mono">dataset_TM_train_motionmillion.py</span>、<span class="mono">models/lit_llama/model_hf.py</span>、<span class="mono">inference_batch.py</span>）から起こした図です。</p>
+
+  <h2>0. 全体像</h2>
+  <p>学習は2段階です。先に FSQ トークナイザでモーションを整数コード列に変換しておき、そのコード列をテキスト条件付きで次トークン予測する LLaMA を学習します。推論は同じ経路を逆向きにたどります。</p>
+  <figure>
+    <div class="frame">
+    <svg viewBox="0 0 840 250" role="img" aria-label="モーションを FSQ でコード化し、テキストは T5 で埋め込み、両方を LLaMA に流して次トークン予測で学習する。推論ではコードを生成して FSQ デコーダで動きに戻す。">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+        <marker id="ar-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="accent-fill"/></marker>
+      </defs>
+      <!-- row 1: motion path -->
+      <rect x="20" y="30" width="130" height="46" rx="4" class="box"/>
+      <text x="85" y="49" text-anchor="middle" class="lbl">モーション .npy</text>
+      <text x="85" y="66" text-anchor="middle" class="lbl small mono muted">T × 272, 30 fps</text>
+
+      <line x1="150" y1="53" x2="206" y2="53" class="edge" marker-end="url(#ar)"/>
+      <text x="178" y="44" text-anchor="middle" class="lbl small muted">正規化</text>
+
+      <rect x="208" y="30" width="130" height="46" rx="4" class="box"/>
+      <text x="273" y="49" text-anchor="middle" class="lbl">FSQ エンコーダ</text>
+      <text x="273" y="66" text-anchor="middle" class="lbl small mono muted">fsq_net_6000000</text>
+
+      <line x1="338" y1="53" x2="394" y2="53" class="edge" marker-end="url(#ar)"/>
+      <text x="366" y="44" text-anchor="middle" class="lbl small muted">2 フレーム/コード</text>
+
+      <rect x="396" y="30" width="150" height="46" rx="4" class="motion-pos"/>
+      <text x="471" y="49" text-anchor="middle" class="lbl">コード列 c₀ … c_{N−1}</text>
+      <text x="471" y="66" text-anchor="middle" class="lbl small mono muted">N = T/2, 0〜65535</text>
+
+      <!-- row 2: text path -->
+      <rect x="20" y="130" width="130" height="46" rx="4" class="box"/>
+      <text x="85" y="149" text-anchor="middle" class="lbl">キャプション .txt</text>
+      <text x="85" y="166" text-anchor="middle" class="lbl small muted">1 モーションに複数行</text>
+
+      <line x1="150" y1="153" x2="206" y2="153" class="edge" marker-end="url(#ar)"/>
+      <text x="178" y="144" text-anchor="middle" class="lbl small muted">サブワード分割</text>
+
+      <rect x="208" y="130" width="130" height="46" rx="4" class="box"/>
+      <text x="273" y="149" text-anchor="middle" class="lbl">T5 エンコーダ</text>
+      <text x="273" y="166" text-anchor="middle" class="lbl small mono muted">flan-t5-xl（凍結）</text>
+
+      <line x1="338" y1="153" x2="394" y2="153" class="edge" marker-end="url(#ar)"/>
+      <text x="366" y="144" text-anchor="middle" class="lbl small muted">トークンごと</text>
+
+      <rect x="396" y="130" width="150" height="46" rx="4" class="text-pos"/>
+      <text x="471" y="149" text-anchor="middle" class="lbl">テキスト埋め込み列</text>
+      <text x="471" y="166" text-anchor="middle" class="lbl small mono muted">Lt × 2048（Lt ≤ 150）</text>
+
+      <!-- merge into LLaMA -->
+      <path d="M546 53 H600 Q612 53 612 65 V100" class="edge" marker-end="url(#ar)"/>
+      <path d="M546 153 H600 Q612 153 612 141 V110" class="edge" marker-end="url(#ar)"/>
+
+      <rect x="560" y="102" width="104" height="2" fill="none"/>
+      <rect x="640" y="76" width="180" height="56" rx="4" class="accent-box"/>
+      <text x="730" y="98" text-anchor="middle" class="lbl accent-text">LLaMA 3B / 7B</text>
+      <text x="730" y="117" text-anchor="middle" class="lbl small muted">テキスト条件付き次トークン予測</text>
+      <path d="M612 104 H638" class="edge-accent" marker-end="url(#ar-acc)"/>
+
+      <!-- bottom: inference return path -->
+      <path d="M730 132 V196 H560" class="edge" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+      <text x="660" y="190" text-anchor="middle" class="lbl small muted">推論: 生成したコード列</text>
+      <rect x="396" y="178" width="162" height="38" rx="4" class="box"/>
+      <text x="477" y="195" text-anchor="middle" class="lbl">FSQ デコーダ</text>
+      <text x="477" y="210" text-anchor="middle" class="lbl small muted">272 次元 → 関節 → GIF</text>
+      <line x1="396" y1="197" x2="340" y2="197" class="edge" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+      <text x="300" y="201" text-anchor="middle" class="lbl small muted">動き</text>
+
+      <text x="20" y="238" class="lbl small muted">実線: 学習時のデータの流れ　破線: 推論時だけ使う経路</text>
+    </svg>
+    </div>
+    <figcaption>学習で更新されるのは LLaMA（と T5 埋め込みを射影する線形層）だけ。FSQ トークナイザと T5 は凍結で、モーションのコード化は学習前に一括で済ませる。</figcaption>
+  </figure>
+
+  <h2>1. 事前処理: モーションをコード列にする</h2>
+  <p>FSQ トークナイザは 272 次元のフレーム列を時間方向に 2 分の 1 に縮め、各ステップを 8×8×8×5×5×5 の格子点（65,536 通り）のどれかに丸めます。格子点の番号がモーションコードです。全モーションのコード列とキャプションを 1 つの <code>all_data.pkl</code> にまとめ、学習時はこれだけを読みます。</p>
+  <figure>
+    <div class="frame">
+    <svg viewBox="0 0 840 170" role="img" aria-label="T フレームの 272 次元列が FSQ エンコーダで T/2 個のコードになり、キャプションと一緒に all_data.pkl に保存される。">
+      <defs>
+        <marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+      </defs>
+      <!-- frames -->
+      <g>
+        <text x="20" y="30" class="lbl">フレーム（T = 8 の例）</text>
+        <g class="mono small">
+          <rect x="20" y="40" width="30" height="30" class="box"/><rect x="52" y="40" width="30" height="30" class="box"/><rect x="84" y="40" width="30" height="30" class="box"/><rect x="116" y="40" width="30" height="30" class="box"/>
+          <rect x="148" y="40" width="30" height="30" class="box"/><rect x="180" y="40" width="30" height="30" class="box"/><rect x="212" y="40" width="30" height="30" class="box"/><rect x="244" y="40" width="30" height="30" class="box"/>
+        </g>
+        <text x="147" y="88" text-anchor="middle" class="lbl small muted">各フレーム 272 次元（ルート速度・向き・関節位置・関節回転・速度）</text>
+      </g>
+      <line x1="290" y1="55" x2="346" y2="55" class="edge" marker-end="url(#ar2)"/>
+      <rect x="348" y="36" width="120" height="38" rx="4" class="box"/>
+      <text x="408" y="53" text-anchor="middle" class="lbl">FSQ エンコーダ</text>
+      <text x="408" y="68" text-anchor="middle" class="lbl small muted">down-t = 1 → 1/2</text>
+      <line x1="468" y1="55" x2="524" y2="55" class="edge" marker-end="url(#ar2)"/>
+      <!-- codes -->
+      <g class="mono">
+        <rect x="526" y="40" width="54" height="30" class="motion-pos"/><text x="553" y="60" text-anchor="middle" class="lbl small mono">c₀</text>
+        <rect x="582" y="40" width="54" height="30" class="motion-pos"/><text x="609" y="60" text-anchor="middle" class="lbl small mono">c₁</text>
+        <rect x="638" y="40" width="54" height="30" class="motion-pos"/><text x="665" y="60" text-anchor="middle" class="lbl small mono">c₂</text>
+        <rect x="694" y="40" width="54" height="30" class="motion-pos"/><text x="721" y="60" text-anchor="middle" class="lbl small mono">c₃</text>
+      </g>
+      <text x="637" y="88" text-anchor="middle" class="lbl small muted">N = T/2 個、各 0〜65535（格子 [8,8,8,5,5,5]）</text>
+
+      <!-- pickle -->
+      <path d="M637 96 V118" class="edge" marker-end="url(#ar2)"/>
+      <path d="M147 96 V140 H300" class="edge" marker-end="url(#ar2)"/>
+      <text x="147" y="112" text-anchor="middle" class="lbl small muted">texts/&lt;名前&gt;.txt</text>
+      <rect x="302" y="120" width="440" height="34" rx="4" class="box"/>
+      <text x="522" y="141" text-anchor="middle" class="lbl"><tspan class="mono">all_data.pkl</tspan> = { text_data[名前], code_data[名前], file_names }</text>
+    </svg>
+    </div>
+    <figcaption>入力の .npy は 30 fps なので、コード 1 個が 1/15 秒に相当する。コードは整数だが、FSQ では 6 軸の座標でもあるので、あとで「どの軸が動いたか」として読める。</figcaption>
+  </figure>
+
+  <h2>2. 学習の 1 ステップ: 入力列の組み立て</h2>
+  <p>LLaMA に入る 1 本の系列は「テキスト位置 ＋ モーションコード ＋ 終了トークン ＋ パディング」で、長さは最大 301 です。テキスト位置は語彙のトークンではなく、T5 の埋め込みを線形層で LLaMA の次元に射影した連続ベクトルで上書きされます。</p>
+  <figure>
+    <div class="frame">
+    <svg viewBox="0 0 840 330" role="img" aria-label="キャプションは T5 で Lt 個の埋め込みになり llama_proj で 3200 次元に射影されてテキスト位置に置かれる。モーションコードは埋め込み表で 3200 次元になる。系列はテキスト位置、コード列、終了トークン、パディングの順に並び、目標は 1 つずらした列で、テキストの最後の位置が最初のコードを予測する。">
+      <defs>
+        <marker id="ar3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+        <marker id="ar3a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="accent-fill"/></marker>
+      </defs>
+      <!-- caption branch -->
+      <text x="20" y="28" class="lbl">キャプション</text>
+      <text x="20" y="46" class="lbl small mono muted">"A person walks forward."</text>
+      <line x1="20" y1="54" x2="20" y2="54" class="edge"/>
+      <path d="M190 40 H224" class="edge" marker-end="url(#ar3)"/>
+      <rect x="226" y="22" width="92" height="36" rx="4" class="box"/>
+      <text x="272" y="38" text-anchor="middle" class="lbl">T5 分割</text>
+      <text x="272" y="52" text-anchor="middle" class="lbl small mono muted">Lt = 7 個</text>
+      <path d="M318 40 H352" class="edge" marker-end="url(#ar3)"/>
+      <rect x="354" y="22" width="104" height="36" rx="4" class="box"/>
+      <text x="406" y="38" text-anchor="middle" class="lbl">T5 エンコーダ</text>
+      <text x="406" y="52" text-anchor="middle" class="lbl small mono muted">Lt × 2048</text>
+      <path d="M458 40 H492" class="edge-accent" marker-end="url(#ar3a)"/>
+      <rect x="494" y="22" width="110" height="36" rx="4" class="accent-box"/>
+      <text x="549" y="38" text-anchor="middle" class="lbl accent-text">llama_proj</text>
+      <text x="549" y="52" text-anchor="middle" class="lbl small mono muted">2048 → 3200</text>
+
+      <!-- code branch -->
+      <text x="20" y="92" class="lbl">コード列（all_data.pkl から）</text>
+      <text x="20" y="110" class="lbl small mono muted">c₀ c₁ … c_{N−1}</text>
+      <path d="M190 104 H224" class="edge" marker-end="url(#ar3)"/>
+      <rect x="226" y="86" width="140" height="36" rx="4" class="box"/>
+      <text x="296" y="102" text-anchor="middle" class="lbl">埋め込み表 wte</text>
+      <text x="296" y="116" text-anchor="middle" class="lbl small mono muted">65538 × 3200</text>
+
+      <!-- sequence row -->
+      <text x="20" y="160" class="lbl">入力列（位置 0 … 300）</text>
+      <g>
+        <rect x="20" y="170" width="38" height="34" class="text-pos"/><rect x="60" y="170" width="38" height="34" class="text-pos"/><rect x="100" y="170" width="38" height="34" class="text-pos"/><rect x="140" y="170" width="38" height="34" class="text-pos"/>
+        <text x="39" y="192" text-anchor="middle" class="lbl small mono">t₀</text><text x="79" y="192" text-anchor="middle" class="lbl small mono">t₁</text><text x="119" y="192" text-anchor="middle" class="lbl small mono">…</text><text x="159" y="192" text-anchor="middle" class="lbl small mono">t₆</text>
+        <rect x="180" y="170" width="38" height="34" class="motion-pos"/><rect x="220" y="170" width="38" height="34" class="motion-pos"/><rect x="260" y="170" width="38" height="34" class="motion-pos"/><rect x="300" y="170" width="38" height="34" class="motion-pos"/><rect x="340" y="170" width="38" height="34" class="motion-pos"/>
+        <text x="199" y="192" text-anchor="middle" class="lbl small mono">c₀</text><text x="239" y="192" text-anchor="middle" class="lbl small mono">c₁</text><text x="279" y="192" text-anchor="middle" class="lbl small mono">c₂</text><text x="319" y="192" text-anchor="middle" class="lbl small mono">…</text><text x="359" y="192" text-anchor="middle" class="lbl small mono">c_{N−1}</text>
+        <rect x="380" y="170" width="46" height="34" class="box"/><text x="403" y="192" text-anchor="middle" class="lbl small mono">END</text>
+        <rect x="428" y="170" width="38" height="34" class="pad-pos"/><rect x="468" y="170" width="38" height="34" class="pad-pos"/><rect x="508" y="170" width="38" height="34" class="pad-pos"/>
+        <text x="447" y="192" text-anchor="middle" class="lbl small mono muted">PAD</text><text x="487" y="192" text-anchor="middle" class="lbl small mono muted">PAD</text><text x="527" y="192" text-anchor="middle" class="lbl small mono muted">…</text>
+      </g>
+      <!-- arrows from branches into sequence -->
+      <path d="M549 58 V74 H99 V168" class="edge-accent" marker-end="url(#ar3a)"/>
+      <text x="112" y="140" class="lbl small accent-text">射影した T5 埋め込みで上書き</text>
+      <path d="M296 122 V168" class="edge" marker-end="url(#ar3)"/>
+      <text x="306" y="150" class="lbl small muted">コードの埋め込み</text>
+
+      <!-- labels under -->
+      <text x="99" y="222" text-anchor="middle" class="lbl small muted">テキスト位置 Lt 個</text>
+      <text x="279" y="222" text-anchor="middle" class="lbl small muted">モーション位置 N 個</text>
+      <text x="403" y="222" text-anchor="middle" class="lbl small mono muted">65536</text>
+      <text x="487" y="222" text-anchor="middle" class="lbl small mono muted">65537</text>
+      <text x="600" y="192" class="lbl small muted">Lt + N + 1 ≤ 301</text>
+
+      <!-- target row -->
+      <text x="20" y="258" class="lbl">目標（1 つ左へずらす）</text>
+      <g>
+        <rect x="20" y="268" width="38" height="34" class="pad-pos"/><rect x="60" y="268" width="38" height="34" class="pad-pos"/><rect x="100" y="268" width="38" height="34" class="pad-pos"/>
+        <text x="39" y="290" text-anchor="middle" class="lbl small mono muted">—</text><text x="79" y="290" text-anchor="middle" class="lbl small mono muted">—</text><text x="119" y="290" text-anchor="middle" class="lbl small mono muted">—</text>
+        <rect x="140" y="268" width="38" height="34" class="accent-box"/><text x="159" y="290" text-anchor="middle" class="lbl small mono accent-text">c₀</text>
+        <rect x="180" y="268" width="38" height="34" class="motion-pos"/><rect x="220" y="268" width="38" height="34" class="motion-pos"/><rect x="260" y="268" width="38" height="34" class="motion-pos"/><rect x="300" y="268" width="38" height="34" class="motion-pos"/>
+        <text x="199" y="290" text-anchor="middle" class="lbl small mono">c₁</text><text x="239" y="290" text-anchor="middle" class="lbl small mono">c₂</text><text x="279" y="290" text-anchor="middle" class="lbl small mono">c₃</text><text x="319" y="290" text-anchor="middle" class="lbl small mono">…</text>
+        <rect x="340" y="268" width="38" height="34" class="box"/><text x="359" y="290" text-anchor="middle" class="lbl small mono">END</text>
+        <rect x="380" y="268" width="46" height="34" class="pad-pos"/><rect x="428" y="268" width="38" height="34" class="pad-pos"/><rect x="468" y="268" width="38" height="34" class="pad-pos"/><rect x="508" y="268" width="38" height="34" class="pad-pos"/>
+        <text x="403" y="290" text-anchor="middle" class="lbl small mono muted">—</text><text x="447" y="290" text-anchor="middle" class="lbl small mono muted">—</text><text x="487" y="290" text-anchor="middle" class="lbl small mono muted">—</text><text x="527" y="290" text-anchor="middle" class="lbl small mono muted">…</text>
+      </g>
+      <text x="560" y="283" class="lbl small">交差エントロピー、PAD（65537）は無視</text>
+      <text x="560" y="299" class="lbl small accent-text">テキスト最後の位置 t₆ が c₀ を予測する</text>
+      <text x="20" y="322" class="lbl small muted">テキスト位置の目標は PAD なので損失に入らない。損失が立つのは t₆ から END までの N+1 箇所。</text>
+    </svg>
+    </div>
+    <div class="legend"><span class="t">テキスト位置</span><span class="m">モーション位置</span><span class="p">パディング / 損失に入らない</span><span class="a">学習される境界</span></div>
+    <figcaption>テキスト位置の数 Lt はキャプションのサブワード数そのもの（上限 150）で、固定長ではない。<span class="mono">llama_proj</span> は T5 の 2048 次元を LLaMA の 3200 次元（7B なら 4096）に写す唯一の線形層で、ここだけがテキストとモーションの接点になる。</figcaption>
+  </figure>
+
+  <h2>3. 注意マスク: テキストは双方向、モーションは因果</h2>
+  <p>全体は因果マスク（下三角）ですが、テキスト位置同士のブロックだけは全て見えるように OR されます。モーション位置はテキスト全体と過去のモーションを参照でき、テキスト位置はモーションを参照できません。</p>
+  <figure>
+    <div class="frame">
+    <svg viewBox="0 0 840 300" role="img" aria-label="Lt=3、N=4 の注意マスク。テキスト 3 位置同士は全て参照可能、モーション位置は自分より前の全位置を参照可能、テキスト位置からモーション位置への参照は不可。">
+      <defs>
+        <pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="currentColor" stroke-width="0.8" opacity="0.25"/></pattern>
+      </defs>
+      <!-- column headers -->
+      <text x="130" y="30" text-anchor="end" class="lbl small muted">参照される位置 →</text>
+      <g class="lbl small mono">
+        <text x="166" y="48" text-anchor="middle">t₀</text><text x="206" y="48" text-anchor="middle">t₁</text><text x="246" y="48" text-anchor="middle">t₂</text>
+        <text x="286" y="48" text-anchor="middle">c₀</text><text x="326" y="48" text-anchor="middle">c₁</text><text x="366" y="48" text-anchor="middle">c₂</text><text x="406" y="48" text-anchor="middle">c₃</text>
+      </g>
+      <!-- row labels -->
+      <g class="lbl small mono">
+        <text x="140" y="80" text-anchor="end">t₀</text><text x="140" y="120" text-anchor="end">t₁</text><text x="140" y="160" text-anchor="end">t₂</text>
+        <text x="140" y="200" text-anchor="end">c₀</text><text x="140" y="240" text-anchor="end">c₁</text><text x="140" y="280" text-anchor="end">c₂</text>
+      </g>
+      <text x="30" y="180" class="lbl small muted" transform="rotate(-90 30 180)" text-anchor="middle">参照する位置</text>
+      <!-- grid: rows t0,t1,t2,c0,c1,c2 ; cols t0,t1,t2,c0,c1,c2,c3 -->
+      <!-- text rows: text block fully visible, motion columns blocked -->
+      <g>
+        <rect x="146" y="60" width="40" height="40" class="text-pos"/><rect x="186" y="60" width="40" height="40" class="text-pos"/><rect x="226" y="60" width="40" height="40" class="text-pos"/>
+        <rect x="266" y="60" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="306" y="60" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="346" y="60" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="386" y="60" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/>
+        <rect x="146" y="100" width="40" height="40" class="text-pos"/><rect x="186" y="100" width="40" height="40" class="text-pos"/><rect x="226" y="100" width="40" height="40" class="text-pos"/>
+        <rect x="266" y="100" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="306" y="100" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="346" y="100" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="386" y="100" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/>
+        <rect x="146" y="140" width="40" height="40" class="text-pos"/><rect x="186" y="140" width="40" height="40" class="text-pos"/><rect x="226" y="140" width="40" height="40" class="text-pos"/>
+        <rect x="266" y="140" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="306" y="140" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="346" y="140" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="386" y="140" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/>
+      </g>
+      <!-- motion rows: causal -->
+      <g>
+        <rect x="146" y="180" width="40" height="40" class="text-pos"/><rect x="186" y="180" width="40" height="40" class="text-pos"/><rect x="226" y="180" width="40" height="40" class="text-pos"/>
+        <rect x="266" y="180" width="40" height="40" class="motion-pos"/><rect x="306" y="180" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="346" y="180" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="386" y="180" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/>
+        <rect x="146" y="220" width="40" height="40" class="text-pos"/><rect x="186" y="220" width="40" height="40" class="text-pos"/><rect x="226" y="220" width="40" height="40" class="text-pos"/>
+        <rect x="266" y="220" width="40" height="40" class="motion-pos"/><rect x="306" y="220" width="40" height="40" class="motion-pos"/><rect x="346" y="220" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/><rect x="386" y="220" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/>
+        <rect x="146" y="260" width="40" height="40" class="text-pos"/><rect x="186" y="260" width="40" height="40" class="text-pos"/><rect x="226" y="260" width="40" height="40" class="text-pos"/>
+        <rect x="266" y="260" width="40" height="40" class="motion-pos"/><rect x="306" y="260" width="40" height="40" class="motion-pos"/><rect x="346" y="260" width="40" height="40" class="motion-pos"/><rect x="386" y="260" width="40" height="40" fill="url(#hatch)" stroke="var(--line)"/>
+      </g>
+      <!-- boundary line -->
+      <line x1="266" y1="60" x2="266" y2="300" class="edge-accent"/>
+      <line x1="146" y1="180" x2="426" y2="180" class="edge-accent"/>
+      <!-- annotations -->
+      <text x="460" y="84" class="lbl">テキスト同士: 双方向</text>
+      <text x="460" y="102" class="lbl small muted">1 語の表現が同じ層で全テキスト位置に混ざる</text>
+      <text x="460" y="140" class="lbl">テキスト → モーション: 不可</text>
+      <text x="460" y="158" class="lbl small muted">テキスト位置はモーションを知らない</text>
+      <text x="460" y="204" class="lbl">モーション → 全テキスト: 可</text>
+      <text x="460" y="240" class="lbl">モーション同士: 因果（過去のみ）</text>
+      <text x="460" y="258" class="lbl small muted">斜線は参照できないマス</text>
+      <text x="460" y="290" class="lbl small muted">コード: model_hf.py の attn_mask = tril OR text_mask</text>
+    </svg>
+    </div>
+    <figcaption>Lt = 3、N = 4 の例。赤の境界線が「テキストとモーションの境目」で、J-Lens の text_to_motion モードはこの境界をまたぐ微分を取る。</figcaption>
+  </figure>
+
+  <h2>4. 学習ループで毎ステップ起きること</h2>
+  <ol class="steps">
+    <li><code>all_data.pkl</code> から 1 モーションを引き、複数あるキャプションから 1 本、コード列が複数あればそのうち 1 本をランダムに選ぶ。</li>
+    <li>3 分の 1 の確率でコード列の先頭か末尾を 1 個落とす（データ拡張）。</li>
+    <li>キャプションを T5 で符号化し、150 トークンで切る。</li>
+    <li>「テキスト位置（PAD 番号）＋コード＋END＋PAD」の列を作り、バッチ内で長さを揃える。</li>
+    <li>LLaMA の forward で、テキスト位置の埋め込みを <code>llama_proj</code> の出力で上書きし、24 層（7B は 36 層）を通して語彙 65,538 個の logit を出す。</li>
+    <li>1 つずらした列と交差エントロピーを取る。PAD 番号は無視するので、損失が立つのは「テキスト最後の位置 → c₀」から「c_{N−1} → END」までの N+1 箇所。</li>
+    <li>bf16 混合精度、コサイン減衰の学習率で更新する。<code>pkeep</code> によるランダム置換は公開設定では 1（無効）。</li>
+  </ol>
+
+  <h2>5. 推論: 学習経路を逆にたどる</h2>
+  <figure>
+    <div class="frame">
+    <svg viewBox="0 0 840 210" role="img" aria-label="プロンプトを必要なら Llama で言い換え、T5 で符号化し、LLaMA が貪欲にコードを 1 個ずつ最大 51 個生成し、FSQ デコーダで 272 次元に戻し、逆正規化と関節復元を経て GIF にする。">
+      <defs>
+        <marker id="ar5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker>
+      </defs>
+      <rect x="20" y="30" width="110" height="44" rx="4" class="box"/>
+      <text x="75" y="48" text-anchor="middle" class="lbl">プロンプト</text>
+      <text x="75" y="64" text-anchor="middle" class="lbl small muted">英文 1 行</text>
+      <line x1="130" y1="52" x2="162" y2="52" class="edge" marker-end="url(#ar5)"/>
+      <rect x="164" y="30" width="118" height="44" rx="4" class="box" stroke-dasharray="4 3"/>
+      <text x="223" y="48" text-anchor="middle" class="lbl">言い換え（任意）</text>
+      <text x="223" y="64" text-anchor="middle" class="lbl small mono muted">Llama-3.1-8B</text>
+      <line x1="282" y1="52" x2="314" y2="52" class="edge" marker-end="url(#ar5)"/>
+      <rect x="316" y="30" width="118" height="44" rx="4" class="box"/>
+      <text x="375" y="48" text-anchor="middle" class="lbl">T5 → llama_proj</text>
+      <text x="375" y="64" text-anchor="middle" class="lbl small muted">テキスト位置を作る</text>
+      <line x1="434" y1="52" x2="466" y2="52" class="edge" marker-end="url(#ar5)"/>
+      <rect x="468" y="22" width="170" height="60" rx="4" class="accent-box"/>
+      <text x="553" y="42" text-anchor="middle" class="lbl accent-text">LLaMA 自己回帰</text>
+      <text x="553" y="58" text-anchor="middle" class="lbl small muted">最後の位置の argmax を追加</text>
+      <text x="553" y="73" text-anchor="middle" class="lbl small muted">END か 51 個で停止</text>
+      <!-- loop arrow -->
+      <path d="M638 40 H668 V95 H553 V84" class="edge" marker-end="url(#ar5)"/>
+      <text x="690" y="98" class="lbl small muted">生成したコードを入力に戻す</text>
+
+      <line x1="553" y1="100" x2="553" y2="100" class="edge"/>
+      <path d="M468 60 H452 V140 H434" class="edge" marker-end="url(#ar5)"/>
+      <rect x="316" y="118" width="118" height="44" rx="4" class="box"/>
+      <text x="375" y="136" text-anchor="middle" class="lbl">FSQ デコーダ</text>
+      <text x="375" y="152" text-anchor="middle" class="lbl small muted">N コード → 2N フレーム</text>
+      <line x1="314" y1="140" x2="282" y2="140" class="edge" marker-end="url(#ar5)"/>
+      <rect x="164" y="118" width="118" height="44" rx="4" class="box"/>
+      <text x="223" y="136" text-anchor="middle" class="lbl">逆正規化・復元</text>
+      <text x="223" y="152" text-anchor="middle" class="lbl small muted">272 → 回転・位置 → SMPL-X</text>
+      <line x1="162" y1="140" x2="130" y2="140" class="edge" marker-end="url(#ar5)"/>
+      <rect x="20" y="118" width="110" height="44" rx="4" class="box"/>
+      <text x="75" y="136" text-anchor="middle" class="lbl">GIF / MP4</text>
+      <text x="75" y="152" text-anchor="middle" class="lbl small muted">22 関節の棒人間</text>
+      <text x="20" y="196" class="lbl small muted">コード 1 個 = 2 フレーム = 1/15 秒なので、51 個の上限で最長 100 フレーム（3.3 秒）。貪欲選択なので同じ文は毎回同じ結果になる。</text>
+    </svg>
+    </div>
+    <figcaption>学習時に一括で入れていたコード列を、推論では 1 個ずつ生成して戻す。デコードは学習で凍結していた FSQ のデコーダをそのまま使う。</figcaption>
+  </figure>
+
+  <h2>6. 主要な定数</h2>
+  <table>
+    <thead><tr><th>項目</th><th>値</th><th>出どころ</th></tr></thead>
+    <tbody>
+      <tr><td>モーション表現</td><td class="mono">272 次元 / フレーム、30 fps</td><td>vector_272</td></tr>
+      <tr><td>FSQ 格子</td><td class="mono">[8, 8, 8, 5, 5, 5] = 65,536</td><td>models/vqvae.py</td></tr>
+      <tr><td>時間圧縮</td><td class="mono">2 フレーム / コード（down-t = 1）</td><td>train_t2m_get_codes.sh</td></tr>
+      <tr><td>語彙</td><td class="mono">65,538 = コード 65,536 + END(65536) + PAD(65537)</td><td>train_t2m_llama.py</td></tr>
+      <tr><td>系列長の上限</td><td class="mono">301（テキスト ≤ 150 を含む）</td><td>--block-size</td></tr>
+      <tr><td>テキストエンコーダ</td><td class="mono">flan-t5-xl、トークンごと 2048 次元、凍結</td><td>--text_encode</td></tr>
+      <tr><td>LLaMA 3B / 7B</td><td class="mono">24 層・3200 次元 / 36 層・4096 次元</td><td>LLaMAHFConfig</td></tr>
+      <tr><td>学習 split</td><td class="mono">3B.pth: train.txt / 3B_all.pth: all.txt（train+val+test）</td><td>README</td></tr>
+      <tr><td>推論の生成上限</td><td class="mono">51 コード（100 フレーム）、貪欲</td><td>model_hf.py sample()</td></tr>
+    </tbody>
+  </table>
+  <p class="src">図中の名前はリポジトリの関数・ファイル名に合わせてあります。</p>
+</main>
