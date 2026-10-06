@@ -50,7 +50,7 @@
 | `lm_head` が実在し、J-lens の $W_U$ として使える | `models/lit_llama/model_hf.py:54` |
 | テキストは `llama_proj(clip_feature)` で注入され、テキスト側に unembedding が無い（B1） | `model_hf.py:63, 173` |
 | テキストは双方向、モーションは因果の注意（B9） | `model_hf.py:583`（`attn_mask` の `logical_or`） |
-| FSQ 語彙は `[8,8,8,5,5,5]` = 65,536 | `models/vqvae.py:68-69` |
+| FSQ 語彙は `[8,8,8,5,5,5]` = 64,000 | `models/vqvae.py:68-69` |
 | 3B は 24 層 × 3200、7B は 36 層 × 4096 | `model_hf.py:37, 40` |
 | 生成は 51 ステップで頭打ち（B10） | `model_hf.py:104` |
 | 論文の 5 つの機能的性質、前 1/3 の層はノイジー | 原典 |

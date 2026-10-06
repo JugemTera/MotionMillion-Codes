@@ -17,7 +17,7 @@ J_\ell = \mathbb{E}_{\text{example}}\ \mathbb{E}_{p \in S}\ \sum_{q \in T} \frac
 $$
 
 推定量は公式と同じ（出力次元ごとに one-hot を全ターゲット位置へ同時に流して逆伝播し、ソース位置で平均）。
-読み出しは $\mathrm{lens}_\ell(h) = \texttt{lm\_head}(\texttt{ln\_f}(J_\ell h))$ で、語彙は **65,536 個の FSQ モーションコード＋終了トークン**。
+読み出しは $\mathrm{lens}_\ell(h) = \texttt{lm\_head}(\texttt{ln\_f}(J_\ell h))$ で、語彙は **64,000 個の FSQ モーションコード（8×8×8×5×5×5）＋終了トークン**（学習スクリプトの `--nb-code 65536` は `vqvae.py` の levels 分岐を選ぶだけで、実際の codebook_size は 64,000。fit では `--nb-code 64000` を渡す）。
 
 言語モデル版との違いは **ソース位置 $S$ とターゲット位置 $T$ の選び方**だけ：
 

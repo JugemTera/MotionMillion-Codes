@@ -47,7 +47,7 @@ def get_args():
     # model (names follow options/option_transformer.py)
     parser.add_argument("--pretrained_llama", default="3B")
     parser.add_argument("--resume-trans", required=True, help="LLaMA checkpoint (.pth with a 'trans' entry)")
-    parser.add_argument("--nb-code", type=int, default=65536)
+    parser.add_argument("--nb-code", type=int, default=64000, help="FSQ codebook size: prod([8,8,8,5,5,5]) = 64000 (the '65536' in the training scripts only selects that levels branch)")
     parser.add_argument("--block-size", type=int, default=301)
     parser.add_argument("--tie-weights", action="store_true")
     parser.add_argument("--t5-path", default="checkpoints/flan-t5-xl")

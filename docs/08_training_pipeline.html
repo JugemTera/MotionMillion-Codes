@@ -99,7 +99,7 @@
 
       <rect x="396" y="30" width="150" height="46" rx="4" class="motion-pos"/>
       <text x="471" y="49" text-anchor="middle" class="lbl">コード列 c₀ … c_{N−1}</text>
-      <text x="471" y="66" text-anchor="middle" class="lbl small mono muted">N = T/2, 0〜65535</text>
+      <text x="471" y="66" text-anchor="middle" class="lbl small mono muted">N = T/2, 0〜63999</text>
 
       <!-- row 2: text path -->
       <rect x="20" y="130" width="130" height="46" rx="4" class="box"/>
@@ -146,7 +146,7 @@
   </figure>
 
   <h2>1. 事前処理: モーションをコード列にする</h2>
-  <p>FSQ トークナイザは 272 次元のフレーム列を時間方向に 2 分の 1 に縮め、各ステップを 8×8×8×5×5×5 の格子点（65,536 通り）のどれかに丸めます。格子点の番号がモーションコードです。全モーションのコード列とキャプションを 1 つの <code>all_data.pkl</code> にまとめ、学習時はこれだけを読みます。</p>
+  <p>FSQ トークナイザは 272 次元のフレーム列を時間方向に 2 分の 1 に縮め、各ステップを 8×8×8×5×5×5 の格子点（64,000 通り）のどれかに丸めます。格子点の番号がモーションコードです。全モーションのコード列とキャプションを 1 つの <code>all_data.pkl</code> にまとめ、学習時はこれだけを読みます。</p>
   <figure>
     <div class="frame">
     <svg viewBox="0 0 840 170" role="img" aria-label="T フレームの 272 次元列が FSQ エンコーダで T/2 個のコードになり、キャプションと一緒に all_data.pkl に保存される。">
@@ -174,7 +174,7 @@
         <rect x="638" y="40" width="54" height="30" class="motion-pos"/><text x="665" y="60" text-anchor="middle" class="lbl small mono">c₂</text>
         <rect x="694" y="40" width="54" height="30" class="motion-pos"/><text x="721" y="60" text-anchor="middle" class="lbl small mono">c₃</text>
       </g>
-      <text x="637" y="88" text-anchor="middle" class="lbl small muted">N = T/2 個、各 0〜65535（格子 [8,8,8,5,5,5]）</text>
+      <text x="637" y="88" text-anchor="middle" class="lbl small muted">N = T/2 個、各 0〜63999（格子 [8,8,8,5,5,5]）</text>
 
       <!-- pickle -->
       <path d="M637 96 V118" class="edge" marker-end="url(#ar2)"/>
@@ -219,7 +219,7 @@
       <path d="M190 104 H224" class="edge" marker-end="url(#ar3)"/>
       <rect x="226" y="86" width="140" height="36" rx="4" class="box"/>
       <text x="296" y="102" text-anchor="middle" class="lbl">埋め込み表 wte</text>
-      <text x="296" y="116" text-anchor="middle" class="lbl small mono muted">65538 × 3200</text>
+      <text x="296" y="116" text-anchor="middle" class="lbl small mono muted">64002 × 3200</text>
 
       <!-- sequence row -->
       <text x="20" y="160" class="lbl">入力列（位置 0 … 300）</text>
@@ -241,8 +241,8 @@
       <!-- labels under -->
       <text x="99" y="222" text-anchor="middle" class="lbl small muted">テキスト位置 Lt 個</text>
       <text x="279" y="222" text-anchor="middle" class="lbl small muted">モーション位置 N 個</text>
-      <text x="403" y="222" text-anchor="middle" class="lbl small mono muted">65536</text>
-      <text x="487" y="222" text-anchor="middle" class="lbl small mono muted">65537</text>
+      <text x="403" y="222" text-anchor="middle" class="lbl small mono muted">64000</text>
+      <text x="487" y="222" text-anchor="middle" class="lbl small mono muted">64001</text>
       <text x="600" y="192" class="lbl small muted">Lt + N + 1 ≤ 301</text>
 
       <!-- target row -->
@@ -257,7 +257,7 @@
         <rect x="380" y="268" width="46" height="34" class="pad-pos"/><rect x="428" y="268" width="38" height="34" class="pad-pos"/><rect x="468" y="268" width="38" height="34" class="pad-pos"/><rect x="508" y="268" width="38" height="34" class="pad-pos"/>
         <text x="403" y="290" text-anchor="middle" class="lbl small mono muted">—</text><text x="447" y="290" text-anchor="middle" class="lbl small mono muted">—</text><text x="487" y="290" text-anchor="middle" class="lbl small mono muted">—</text><text x="527" y="290" text-anchor="middle" class="lbl small mono muted">…</text>
       </g>
-      <text x="560" y="283" class="lbl small">交差エントロピー、PAD（65537）は無視</text>
+      <text x="560" y="283" class="lbl small">交差エントロピー、PAD（64001）は無視</text>
       <text x="560" y="299" class="lbl small accent-text">テキスト最後の位置 t₆ が c₀ を予測する</text>
       <text x="20" y="322" class="lbl small muted">テキスト位置の目標は PAD なので損失に入らない。損失が立つのは t₆ から END までの N+1 箇所。</text>
     </svg>
@@ -328,7 +328,7 @@
     <li>3 分の 1 の確率でコード列の先頭か末尾を 1 個落とす（データ拡張）。</li>
     <li>キャプションを T5 で符号化し、150 トークンで切る。</li>
     <li>「テキスト位置（PAD 番号）＋コード＋END＋PAD」の列を作り、バッチ内で長さを揃える。</li>
-    <li>LLaMA の forward で、テキスト位置の埋め込みを <code>llama_proj</code> の出力で上書きし、24 層（7B は 36 層）を通して語彙 65,538 個の logit を出す。</li>
+    <li>LLaMA の forward で、テキスト位置の埋め込みを <code>llama_proj</code> の出力で上書きし、24 層（7B は 36 層）を通して語彙 64,002 個の logit を出す。</li>
     <li>1 つずらした列と交差エントロピーを取る。PAD 番号は無視するので、損失が立つのは「テキスト最後の位置 → c₀」から「c_{N−1} → END」までの N+1 箇所。</li>
     <li>bf16 混合精度、コサイン減衰の学習率で更新する。<code>pkeep</code> によるランダム置換は公開設定では 1（無効）。</li>
   </ol>
@@ -384,9 +384,9 @@
     <thead><tr><th>項目</th><th>値</th><th>出どころ</th></tr></thead>
     <tbody>
       <tr><td>モーション表現</td><td class="mono">272 次元 / フレーム、30 fps</td><td>vector_272</td></tr>
-      <tr><td>FSQ 格子</td><td class="mono">[8, 8, 8, 5, 5, 5] = 65,536</td><td>models/vqvae.py</td></tr>
+      <tr><td>FSQ 格子</td><td class="mono">[8, 8, 8, 5, 5, 5] = 64,000（設定名の 65536 は分岐ラベル）</td><td>models/vqvae.py</td></tr>
       <tr><td>時間圧縮</td><td class="mono">2 フレーム / コード（down-t = 1）</td><td>train_t2m_get_codes.sh</td></tr>
-      <tr><td>語彙</td><td class="mono">65,538 = コード 65,536 + END(65536) + PAD(65537)</td><td>train_t2m_llama.py</td></tr>
+      <tr><td>語彙</td><td class="mono">64,002 = コード 64,000 + END(64000) + PAD(64001)</td><td>train_t2m_llama.py</td></tr>
       <tr><td>系列長の上限</td><td class="mono">301（テキスト ≤ 150 を含む）</td><td>--block-size</td></tr>
       <tr><td>テキストエンコーダ</td><td class="mono">flan-t5-xl、トークンごと 2048 次元、凍結</td><td>--text_encode</td></tr>
       <tr><td>LLaMA 3B / 7B</td><td class="mono">24 層・3200 次元 / 36 層・4096 次元</td><td>LLaMAHFConfig</td></tr>

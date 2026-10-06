@@ -3,7 +3,7 @@
 python fit_jlens.py \
 --pretrained_llama 3B \
 --resume-trans ./checkpoints/pretrained_models/motionmillion_3B_all.pth \
---nb-code 65536 \
+--nb-code 64000 \
 --block-size 301 \
 --t5-path checkpoints/flan-t5-xl \
 --clip-dim 2048 \

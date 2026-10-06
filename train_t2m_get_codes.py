@@ -149,4 +149,4 @@ if __name__ == '__main__':
             if accelerator.is_main_process:
                 logger.info(f"The code has been saved in {args.vq_dir} before!")
     
-    merge_into_pickle(root_dir, pjoin(root_dir, "split/version1/t2m_60_300/all.txt"))            
+    merge_into_pickle(root_dir, pjoin(root_dir, "split", args.version, "all.txt"))            
