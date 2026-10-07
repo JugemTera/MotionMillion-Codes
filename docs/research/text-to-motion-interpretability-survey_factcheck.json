@@ -1,0 +1,1224 @@
+{
+  "schema_version": "1.0",
+  "run_id": "fc-20261007-154354",
+  "scope": "standard",
+  "decision_intent": "learning_only",
+  "overall_verdict": "passed_with_notes",
+  "iteration": 1,
+  "execution_mode": "subagent",
+  "summary": {
+    "total_claims": 51,
+    "match": 46,
+    "partial": 5,
+    "mismatch": 0,
+    "unverifiable": 0,
+    "dangling": 0,
+    "passed_with_notes": 0
+  },
+  "claims": [
+    {
+      "claim_id": "C01",
+      "claim_text": "J-lens の原典は「中間層帯域にのみ存在し、活性分散の 10% 未満、単一トークン概念に限る」という条件を明示している",
+      "citation_ids": [
+        "[10]",
+        "[11]",
+        "[12]",
+        "[13]",
+        "[14]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[10] \"The workspace operates in intermediate layers, between an early regime... and a late regime\" / \"The J-space component typically accounts for only a small fraction of total activation variance (varying by layer, but never more than 10%).\" / \"The J-lens can only identify vectors associated with concepts that correspond to single tokens in the model's vocabulary, but many important concepts correspond to multiple tokens.\"",
+        "discrepancy_note": "[10]（Anthropic, Verbalizable Representations Form a Global Workspace in Language Models）で3点とも確認。原文は「never more than 10%」（10%を超えない）であり「10%未満」とほぼ同義。なお [11]〜[14] は J-lens 原典ではなく、本クレームの根拠にはならない（[11] は J-lens の数学的分析、[12][13][14] は VLA/音楽/音声の別論文）。",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C02",
+      "claim_text": "2025〜2026 年の text-to-motion（T2M）は、FSQ/VQ 離散トークンを LLaMA 系デコーダで自己回帰生成する系統（ScaMo → MotionMillion）と、DiT ベースの拡散・フローマッチング系統（HY-Motion 1.0 など）が並走している",
+      "citation_ids": [
+        "[1]",
+        "[2]",
+        "[3]",
+        "[4]",
+        "[5]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[2] abs: \"the motion tokenizer Motion FSQ-VAE and a text-prefix autoregressive transformer\"; [2] html: architecture \"closely aligns with that of LLaMA\". [1] html: FSQ tokenizer + transformer decoder, 1B/3B/7B. [3] abs: \"first successful attempt to scale up Diffusion Transformer (DiT)-based flow matching models\" to \"billion-parameter scale\".",
+        "discrepancy_note": "AR/FSQ 系統は [1][2]、DiT フローマッチング系統は [3] で確認。[4][5] は 2025-26 年のトークナイザ研究として整合（VQ/RVQ ベース）。",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C03",
+      "claim_text": "logit lens は中間層残差に最終正規化と unembedding をそのまま適用して語彙分布を読む手法であり、J_ℓ = I の特殊ケースである",
+      "citation_ids": [
+        "[10]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "\"The logit lens applies the unembedding matrix directly to the intermediate residual stream, which corresponds to setting J_ℓ = I in our formulation.\" / \"lens(h_ℓ) = softmax(W_U norm(J_ℓ h_ℓ))\"",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C04",
+      "claim_text": "FSQ は各次元を有限レベルに丸める量子化で、コードブック崩壊がなく語彙を大きくできる",
+      "citation_ids": [
+        "[2]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[2] html: \"instead of using argmin, FSQ tries to round z as ẑ = Q(z) = round(f(z))\" ... \"FSQ mitigates the codebook collapse issue and achieves superior performance\" when scaling to larger codebook sizes.",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C05",
+      "claim_text": "Latent Code Replacement は概念条件付き頻度比で特定した離散コードを置換して概念を除去する学習不要手法である",
+      "citation_ids": [
+        "[8]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "Abstract: \"propose Latent Code Replacement (LCR), a novel, training-free approach that identifies violent codes in a discrete codebook representation and substitutes them with safe alternatives.\" HTML: violent codes selected by score s_k = N_k(D_f) / N_k(D_r) (count of code k in forget set vs retain set); codes with highest s_k are \"those that frequently appear in violent motions but rarely in safe ones\"; each is \"replaced with a randomly sampled safe code c̄ ∈ C \\ C_f plus noise ε\".",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C06",
+      "claim_text": "自己回帰 LLM 型は ScaMo から MotionMillion（2,000 時間超・200 万系列、wavelet 前処理付き FSQ、1B/3B/7B）へとスケールした",
+      "citation_ids": [
+        "[1]",
+        "[2]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[1] abs: \"over 2,000 hours and 2 million high-quality motion sequences\", \"scale our model to 7B parameters\". [1] html: Table 3 \"Ablation on whether to use wavelet transformation during training the FSQ model\"; model scales 1B, 3B, 7B. [2] abs: Motion FSQ-VAE + text-prefix autoregressive transformer (ScaMo).",
+        "discrepancy_note": "数値・構成は [1] で確認、ScaMo 起点は [2] で確認。",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C07",
+      "claim_text": "HY-Motion 1.0 は DiT ベースのフローマッチングを 10 億パラメータ規模へ拡張し、3,000 時間超の事前学習・400 時間の微調整・RLHF という 3 段階で指示追従性を主張する",
+      "citation_ids": [
+        "[3]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[3] abs: \"first successful attempt to scale up Diffusion Transformer (DiT)-based flow matching models\" ... \"billion-parameter scale\" ... \"large-scale pretraining on over 3,000 hours of motion data\" ... \"high-quality fine-tuning on 400 hours of curated data\" ... \"reinforcement learning from both human feedback and reward models\" ... \"instruction-following capabilities that significantly outperform current open-source benchmarks\".",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C08",
+      "claim_text": "MotionCLR は拡散 T2M の cross-attention が「どの単語が第 i フレームで活性化するか」を直接担うことを示し、attention 操作だけで強調・置換・消去・並べ替え編集を実現した",
+      "citation_ids": [
+        "[6]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "Abstract: \"the cross-attention mechanism works to find the fine-grained word-sequence correspondence and activate the corresponding timesteps in the motion sequence.\" HTML Sec.4: \"the cross-attention value of each word along the time axis works as an activator to determine the execution time of each action\"; editing ops via attention maps: in-place motion replacement (4.1), motion emphasis/de-emphasis (4.2), motion erasing (4.3), motion sequence shifting (4.4), example-based generation (4.5), style transfer (4.6).",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C09",
+      "claim_text": "SATO は HumanML3D 記述の 99.13% を摂動した評価で T2M-GPT の FID が 0.141 から 1.754 へ悪化することを示した",
+      "citation_ids": [
+        "[7]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "HTML Table 4: 99.13% of HumanML3D descriptions successfully perturbed (avg 25.08% of words perturbed). Table 1 (HumanML3D): T2M-GPT FID 0.141±.005 on original text, FID_P 1.754±.004 on perturbed text; SATO (T2M-GPT) FID_P 0.155±.007.",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C10",
+      "claim_text": "SafeMo は離散コード置換が良性タスクを劣化させると批判し連続空間で unlearning する",
+      "citation_ids": [
+        "[19]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "\"discrete codebook replacement-based methods have two critical flaws: firstly, replacing codebook entries which are reused by benign prompts leads to drifts on everyday tasks, degrading the model's benign performance; secondly ... quantization and smoothness loss\" ... \"we propose SafeMo ... Minimal Motion Unlearning (MMU) ... enabling safe human motion generation in continuous space, preserving continuous kinematics without codebook loss\"",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C11",
+      "claim_text": "Words in Motion はモーション予測 Transformer の隠れ状態に速度・加速度・方向が線形プローブ精度 0.70〜1.00 で読めることを示した",
+      "citation_ids": [
+        "[9]"
+      ],
+      "verdict": "partial",
+      "mismatch_type": "numeric_error",
+      "confidence": "medium",
+      "evidence": {
+        "source_excerpt": "Abstract: linear probing of hidden states in transformer-based motion forecasting models shows \"high probing accuracy\". HTML: features probed are speed, acceleration, direction, agent type on Wayformer/RedMotion/HPTR. AV2F: speed ≈0.70–0.74, acceleration ≈0.55–0.70, direction ≈0.75–0.80, agent type ≈0.94–1.00. Waymo (RedMotion): speed 0.91–0.95, acceleration 0.76–0.80, direction 0.70–0.80, agent type ≈1.00.",
+        "discrepancy_note": "Features and transformer-based motion forecasting models confirmed. However the stated range 0.70–1.00 is not uniformly supported: acceleration probing accuracy on AV2F is reported around 0.55–0.70, i.e. below 0.70. The 0.70–1.00 range holds for speed/direction/agent type and for all features on Waymo, but not for acceleration on AV2F.",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": "線形プローブ精度はおおむね 0.55〜1.00（加速度は AV2F で約 0.55〜0.70 と低め、速度・方向・エージェント種別は 0.70〜1.00）と記載するか、「概ね 0.7 以上」のような幅を持たせた表現にする。"
+    },
+    {
+      "claim_id": "C12",
+      "claim_text": "ParTY は腕・脚別のテキスト接地と、部位レベル R-Precision／FID、時間コヒーレンス（部位間速度の相互相関）・空間コヒーレンスという部位帰属用の指標を導入した",
+      "citation_ids": [
+        "[20]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "Abstract: \"Part-aware Text Grounding, which diversely transforms text embeddings and appropriately aligns them with each body part\". HTML: \"we independently train arms and legs motion encoders\" and compute \"part-level R-Precision, FID, and MM-Dist\"; temporal coherence score based on \"pairwise cross-correlation\" of normalized part velocity signals over sliding windows; spatial coherence from \"inter-part distances\" and \"part-torso angles\" converted to consistency scores; Part Gate \"dedicated to arms and legs\".",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C13",
+      "claim_text": "FrankenMotion は部位×時間区間の原子的アノテーションを初めて提供した",
+      "citation_ids": [
+        "[21]",
+        "[22]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[21] Abstract: \"we construct a high-quality motion dataset with atomic, temporally-aware part-level text annotations ... This is, to our knowledge, the first work to provide atomic, temporally-aware part-level motion annotations and have a model that allows motion generation with both spatial (body part) and temporal (atomic action) control.\"",
+        "discrepancy_note": "Confirmed via [21] (FrankenMotion, arXiv 2601.10909). [22] (arXiv 2411.15472) is KinMo (kinematic-group hierarchical annotations) and does not mention FrankenMotion; it serves at most as related prior work.",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C14",
+      "claim_text": "Voas らは FID・R-Precision・MM-Dist がサンプルレベルでは人間判断とほぼ相関しない（R-Precision の相関 0.036〜0.042）ことを 1,400 対の人手評価で示した",
+      "citation_ids": [
+        "[23]"
+      ],
+      "verdict": "partial",
+      "mismatch_type": "overstated",
+      "confidence": "medium",
+      "evidence": {
+        "source_excerpt": "Abstract: \"none of the metrics currently used for this task show even a moderate correlation with human judgments on a sample level.\" HTML: \"resulting in 1400 rated motion-text pairs (280 distinct prompts for each baseline model)\"; Table 1 sample-level correlation: R-Precision 0.036 (Faithfulness) / 0.042 (Naturalness); Multimodal Distance 0.025 / 0.014; \"FID is only accurate with large sample sizes, we report correlations for FID at the model level only\".",
+        "discrepancy_note": "1,400 pairs and R-Precision 0.036–0.042 and MM-Dist near-zero sample-level correlation are confirmed. However FID was NOT evaluated at the sample level (the paper reports FID correlation only at model level), so listing FID among metrics shown to be uncorrelated at sample level is not supported by the source.",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": "「R-Precision・MM-Dist がサンプルレベルでは人間判断とほぼ相関しない（R-Precision 0.036〜0.042、MM-Dist 0.014〜0.025）。FID はサンプル数依存のためモデルレベルでのみ評価された」とし、FID をサンプルレベルの列挙から外す。"
+    },
+    {
+      "claim_id": "C15",
+      "claim_text": "T2MBench は 1,025 件の OOD プロンプトで、細粒度（数値・部位相対位置）の正確さがほぼ全モデルのボトルネックだと報告する",
+      "citation_ids": [
+        "[15]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "\"we construct an OOD prompt dataset consisting of 1,025 textual descriptions ... integrates LLM-based Evaluation, Multi-factor Motion evaluation, and Fine-grained Accuracy Evaluation ... most models struggle to achieve strong performance with Fine-grained Accuracy Evaluation.\"",
+        "discrepancy_note": "The abstract confirms 1,025 prompts and fine-grained accuracy as the common weakness; the parenthetical detail (numeric / body-part relative position) is not spelled out in the abstract but is a plausible gloss of 'Fine-grained Accuracy Evaluation'.",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C16",
+      "claim_text": "J-lens 原典（Anthropic）は、J-space が約 100 層モデルの層 38〜92 の中間帯域にのみ意味を持つと明記する",
+      "citation_ids": [
+        "[10]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "medium",
+      "evidence": {
+        "source_excerpt": "\"Pre-workspace (layers 0–33). No pair of lenses agrees on its readouts.\" / \"Early workspace (layers ~38–58). The J-lens begins to recover intermediates while the logit lens largely does not.\" / \"Late workspace (layers ~62–92). The logit lens begins to surface useful intermediates, and its readouts converge toward the J-lens's.\" / \"Past the workspace ('motor' layers). In the final few layers, all three methods collapse together on every measure.\" / 約100層（0–100に再インデックス）",
+        "discrepancy_note": "層帯域 38〜92 は原典のレンズ比較節（早期 workspace ~38–58、後期 workspace ~62–92）から確認。ただし原典は「~」付きの概数であり、「のみ意味を持つ」という限定表現までは原典にそのまま無い（最終数層でも3レンズは収束しており、J-lens が無意味とは述べていない）。",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": "「約 100 層モデルで workspace 帯域は概ね層 38〜92（早期 ~38–58、後期 ~62–92）とされる」のように概数であることを明示する。"
+    },
+    {
+      "claim_id": "C17",
+      "claim_text": "J-lens 原典は、tuned lens は「出力へ先回りする」傾向があり、logit lens とは後半層で一致するとしている",
+      "citation_ids": [
+        "[10]"
+      ],
+      "verdict": "partial",
+      "mismatch_type": "overstated",
+      "confidence": "medium",
+      "evidence": {
+        "source_excerpt": "\"The tuned lens is trained to match the model's final-layer prediction, and it appears to be 'too good at its job.' It is able to infer from early-layer signals what kind of token the answer will be, and from then on reports the most likely token of that kind at every layer.\" / \"The tuned lens tends to 'skip ahead' to the output rather than surface those intermediates\" / \"In the final few layers, all three methods converge on the model's next-token prediction, as expected.\"",
+        "discrepancy_note": "「出力へ先回りする（skip ahead）」は原典で確認。一方、tuned lens と logit lens の一致は「最終数層（final few layers）で3レンズすべてが収束する」という記述であり、「後半層」という広い帯域での一致とは述べていない（後期 workspace 62–92 で logit lens が収束するのは J-lens に対して）。",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": "「tuned lens は出力へ先回りする傾向があり、最終数層では logit lens・J-lens とともに次トークン予測へ収束する」と修正する。"
+    },
+    {
+      "claim_id": "C18",
+      "claim_text": "Alibaba の数学的分析は、平均ヤコビアンがガウス仮定下で最小二乗の最適線形読み出しに一致し、深い層・スパースな位置でのみ忠実（上位 10〜20% の位置対が情報の大半）だと示す",
+      "citation_ids": [
+        "[11]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "medium",
+      "evidence": {
+        "source_excerpt": "\"Under Gaussian inputs, the averaged Jacobian matrix is exactly equal to the population least-squares slope.\" / \"both the nonlinear bias and the non-Gaussian error decrease as the source layer approaches the target layer\" / \"a small top fraction of pairs accounts for most of the mass\" / \"only the Jacobian matrices from the top 10% to 20% of positions by energy\"",
+        "discrepancy_note": "ガウス仮定下の最小二乗等価、深い層ほど近似誤差が小さい点、エネルギーが少数の位置対に集中し上位 10〜20% の位置をフィルタに用いる点は HTML 版で確認。「でのみ忠実」はやや強い表現で、原典は深い層ほど誤差が減少すると述べる。arXiv ページに著者所属（Alibaba）は明記されていない。",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C19",
+      "claim_text": "VLA では FFN 値ベクトルを語彙空間に射影して「fast/slow/up/high」方向を抽出し活性 steering する手法が LIBERO-Long で平均 27.73% の改善を得た",
+      "citation_ids": [
+        "[12]",
+        "[25]"
+      ],
+      "verdict": "partial",
+      "mismatch_type": "overstated",
+      "confidence": "medium",
+      "evidence": {
+        "source_excerpt": "[25] \"we project feedforward activations within transformer layers onto the token embedding basis, identifying sparse semantic directions — such as speed and direction\" / \"All simulation experiments use the 7B-parameter OpenVLA model, with the fine-tuned LIBERO-Long checkpoint\" / \"The fast clusters consistently induce larger end-effector displacements across tasks, with an average improvement of 27.73% over slow clusters\"",
+        "discrepancy_note": "[25] で確認。27.73% は LIBERO-Long 上で fast クラスタ steering が slow クラスタに比べてエンドエフェクタ変位を平均 27.73% 大きくしたという数値であり、タスク成功率などの「改善」ではない。[12]（Event-Grounded SAE 論文）はこのクレームの根拠にならない。",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": "「LIBERO-Long において fast クラスタの steering は slow クラスタに比べエンドエフェクタ変位を平均 27.73% 増加させた」と、指標を明示して修正する。引用は [25] のみとする。"
+    },
+    {
+      "claim_id": "C20",
+      "claim_text": "Event-Grounded SAE は OpenVLA 層 31 で事象整合特徴のゼロ化により成功率が −21.2 pp（ランダム対照は −1.3 pp）であった",
+      "citation_ids": [
+        "[12]",
+        "[25]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[12] \"Layer 31 is closest to the OpenVLA action head, so a hook there leaves the fewest downstream layers to amplify its reconstruction error\" / Table 3: \"OpenVLA residual | 31 | 70.0% | 48.8% (-21.2)\" / random-alive control: \"68.7% (-1.3)\"",
+        "discrepancy_note": "[12]（HTML 版 Table 3）で確認。[25] には SAE・層 31・−21.2/−1.3 の記述はなく、本クレームの根拠にならない。",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C21",
+      "claim_text": "音楽（MusicGen）では残差ストリーム SAE で音楽理論概念と言語化不能概念を発見し steering に成功した",
+      "citation_ids": [
+        "[13]",
+        "[14]",
+        "[26]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[13] \"MusicGen models: MusicGen-Large (MGL) and MusicGen-Small (MGS)\" / \"extracting interpretable features from the residual stream of a transformer model\" / \"Our results reveal both familiar musical concepts and coherent but uncodified patterns lacking clear counterparts in theory or language\" / \"Participants largely selected the SAE-steered audio (66/100, compared to 17 each for baseline and random; χ²=48.02, p<.0001)\"",
+        "discrepancy_note": "[13] で確認（MusicGen の名称は HTML 版本文で確認）。[14]（音声 LLM 韻律）と [26]（CosyVoice3 TTS）は MusicGen を扱っておらず、本クレームの根拠にならない。",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C22",
+      "claim_text": "TTS LM（CosyVoice3）では笑い・性別・話速の SAE 特徴を操作した",
+      "citation_ids": [
+        "[13]",
+        "[14]",
+        "[26]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[26] \"We train BatchTopK sparse autoencoders on the LM backbone of CosyVoice3 ... targeted interventions raise laughter probability from 0.02 to 0.79, flip perceived speaker gender, and control speech rate while preserving spoken content.\"",
+        "discrepancy_note": "[26] 抄録で確認。[13][14] は CosyVoice3 を扱っておらず、本クレームの根拠にならない。",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C23",
+      "claim_text": "音声 LLM では logit lens で「韻律は後半層で AUC 0.81〜1.00 で復号できるのに回答では 0〜92% しか使われない」ことを activation patching で因果的に示した",
+      "citation_ids": [
+        "[13]",
+        "[14]",
+        "[26]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "medium",
+      "evidence": {
+        "source_excerpt": "[14] \"At each layer, we apply the model's unembedding matrix and compute the relative log-odds of the relevant prosodic-pole token sets.\" / \"The late stack carries a strong prosodic code in eight of the eleven cells. Lens AUC is 0.81–1.00\" / \"On IViE, Qwen, Phi-4, and AF3 recover 30–36% of the available range, while DeSTA recovers 0%.\" / \"AF3 nearly closes the gap on acted CREMA-D (92%)\" / \"we use activation patching. For each matched pair, we replace the recipient clip's answer-position state at L∗ with the corresponding state from an opposite-class donor clip\"",
+        "discrepancy_note": "[14] HTML 版で確認。「0〜92%」は原典の複数セル（DeSTA 0%、AF3 CREMA-D 92% など）の値域をレポート側で要約したもので、原典に「0–92%」という表記そのものはない。因果性については原典は介入が回答分布を動かすと述べつつ「This does not by itself prove that the unedited forward pass fully uses this state」と留保している。[13][26] は根拠にならない。",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C24",
+      "claim_text": "MoCHA は「モーションから回復可能な意味」だけで対照学習すると HumanML3D→KIT-ML 転移で R@1 が +94% 相対改善することを示した",
+      "citation_ids": [
+        "[27]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "\"MoCHA, a text canonicalization framework that reduces this variance by projecting each caption onto its motion-recoverable content prior to encoding ... improves cross-dataset transfer substantially, with H to K improving by 94% and K to H by 52%\"",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C25",
+      "claim_text": "MotionMillion のキャプションは GPT-4o 生成＋LLaMA 3.1-8B による 20 通りの言い換えである",
+      "citation_ids": [
+        "[1]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[1] html Sec. 3.3: \"we input this clip to GPT-4o to obtain the description of the human action\"; \"we further prompt the model of LLAMA 3.1-8B to rewrite the motion description 20 times without changing the original semantic meaning\".",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C26",
+      "claim_text": "2025 年のサーベイ 2 本は T2M を「アーキテクチャ（VAE／拡散／ハイブリッド）」と「表現（離散／連続）」の 2 軸で整理している",
+      "citation_ids": [
+        "[30]",
+        "[31]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "medium",
+      "evidence": {
+        "source_excerpt": "[30] Abstract: \"categorizing them from two complementary perspectives: (i) architectural, dividing methods into VAE-based, diffusion-based, and hybrid models; and (ii) motion representation, distinguishing between discrete and continuous motion generation strategies.\" [31] HTML: Sec.3.3 \"Visual Tokenizer\" (discrete VQ-VAE/VQ-GAN/VQ-Diffuse tokenization vs continuous latent diffusion), Sec.4.2–4.4 T2M using GAN / VAE / Diffusion, Sec.5.2–5.3 autoregressive and unified AR+diffusion.",
+        "discrepancy_note": "The exact two-axis framing (VAE/diffusion/hybrid × discrete/continuous) is verbatim in [30]. [31] (Multimodal GenAI with AR LLMs survey) covers both an architecture taxonomy (GAN/VAE/diffusion/AR/unified) and discrete-tokenizer vs continuous representations, but does not state 'hybrid' or frame it as exactly two axes; the claim's wording fits [30] precisely and [31] only approximately.",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C27",
+      "claim_text": "Autodesk Research のサーベイは評価指標とベンチマークの標準化不足を指摘している",
+      "citation_ids": [
+        "[32]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "medium",
+      "evidence": {
+        "source_excerpt": "HTML affiliations: \"Aliasghar Khani Affiliation: Autodesk Research ... Arianna Rampini Affiliation: Autodesk Research ... Bruno Roy Affiliation: Autodesk Research\" (all authors). Text: \"compiling the evaluation metrics and datasets used in recent works makes it easier to compare methods, assess progress, identify evaluation gaps, and guide the development of standardized benchmarks for future research.\"",
+        "discrepancy_note": "Autodesk Research affiliation confirmed. The survey speaks of 'evaluation gaps' and the need to 'guide the development of standardized benchmarks', which implies but does not use the literal phrase 'lack of standardization'; wording in the claim is a mild paraphrase.",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C28",
+      "claim_text": "ScaMo は Motion FSQ-VAE と、凍結 T5-XL の単語レベル特徴をプレフィックスにした LLaMA 型 Transformer（テキストは双方向・モーションは因果 attention、44M〜3B）を組み合わせた",
+      "citation_ids": [
+        "[2]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[2] html: \"we use a frozen T5-XL as the encoder\" with \"text encoded as tokens for each word\", features \"prefixed in the auto-regressive motion generation model\"; \"bidirectional attention to text tokens and causal attention to motion tokens\"; architecture \"closely aligns with that of LLaMA\"; Table 1 sizes \"44M, 111M, 343M, 775M, 1.4B, 3B\".",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C29",
+      "claim_text": "ScaMo は「大きいモデルほど大きい語彙を要する」（N_v ∝ N_nv^1.467）というスケーリング則を得た",
+      "citation_ids": [
+        "[2]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[2] html: \"Nv = 10^-5.604 · Nnv^1.467\"; \"Large model deserves large vocabulary sizes.\"",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C30",
+      "claim_text": "MotionMillion は FSQ の前に wavelet 変換を入れてジッタを抑え、MPJPE を 46.8 mm から 45.5 mm に改善した",
+      "citation_ids": [
+        "[1]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[1] html Table 3 \"Ablation on whether to use wavelet transformation during training the FSQ model\": MPJPE without wavelet 46.8 mm → with wavelet 45.5 mm; acceleration deviation 6.0→4.0 (mean), 15.0→12.0 (max). Sec. 5.1: information loss in discretized compression \"leading to severe jitter\".",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C31",
+      "claim_text": "MotionMillion は 3B で FID 10.8・R@1 0.79、7B で FID 10.3・R@1 0.79 を報告する",
+      "citation_ids": [
+        "[1]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[1] html Table 4: 3B — FID 10.8, R@1 0.79; 7B — FID 10.3, R@1 0.79.",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C32",
+      "claim_text": "MotionMillion の著者ら自身が「FID・R-Precision では 3B と 7B を区別できない」と述べている",
+      "citation_ids": [
+        "[1]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[1] html Sec. 5.2: \"When the model size improved from 3B to 7B, it was difficult to effectively reflect the difference between the two models from the metrics\".",
+        "discrepancy_note": "原文は「metrics から両モデルの差を効果的に反映するのが難しかった」という表現で、クレームの鉤括弧内はその要約的言い換え（Table 4 の metrics は FID / R-Precision 等）。趣旨は一致。",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C33",
+      "claim_text": "公式リポジトリは T5-XL テキストエンコーダ、FSQ トークナイザ、3B/7B の LLaMA、ZeRO-1/2 による学習、MotionMillion-Eval 評価スクリプトを提供する",
+      "citation_ids": [
+        "[33]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[33] README: \"3B and 7B models trained on train.txt and all.txt respectively\"; FSQ tokenizer; T5-XL text encoder (downloaded via script); \"Train 3B model on multi-gpus by ZeRO-1 parallel\", \"Train 7B model on multi-gpus by ZeRO-2 parallel\"; MotionMillion-Eval benchmark with evaluation scripts.",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C34",
+      "claim_text": "Being-M0（ICML 2025）は 100 万件超の MotionLib と 2D lookup-free トークナイザでスケーリングの重要性を主張する",
+      "citation_ids": [
+        "[34]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "Venue: ICML 2025. \"MotionLib, the first million-level dataset for motion generation, which is at least 15× larger than existing counterparts\"; \"Being-M0\"; importance of \"scaling both data and model size\"; Motionbook with \"a novel 2D lookup-free motion tokenizer that preserves fine-grained motion details while expanding codebook capacity\".",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C35",
+      "claim_text": "MARDM（CVPR 2025）は VQ 離散化が情報損失と多様性低下を招くと批判し、連続空間でのマスク自己回帰＋拡散を提案する",
+      "citation_ids": [
+        "[16]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "Venue: CVPR 2025. \"Representing continuous motion data as limited discrete tokens leads to inevitable information loss, reduces the diversity of generated motions\" ... \"a human motion diffusion model enabled to perform masked autoregression, optimized with a reformed data representation and distribution\" preserving diffusion's continuous-space strengths.",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C36",
+      "claim_text": "MotionStreamer（ICCV 2025）は離散トークンの誤差蓄積と非因果性を避けるため、連続因果潜在空間での拡散自己回帰を採る",
+      "citation_ids": [
+        "[17]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "Venue: ICCV 2025. \"GPT-based methods suffer from delayed response and error accumulation problem due to discretized non-causal tokenization\" ... \"a continuous causal latent space into a probabilistic autoregressive model\" ... continuous latents address \"information loss caused by discretization and effectively reduce error accumulation during long-term autoregressive generation\". Title: \"Diffusion-based Autoregressive Model in Causal Latent Space\".",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C37",
+      "claim_text": "LMR は Dual-Granularity Tokenizer で、T/4 に圧縮した意味潜在と全解像度の実行潜在を分ける",
+      "citation_ids": [
+        "[4]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[4] abs: \"Dual-Granularity Tokenizer that disentangles motion into two distinct manifolds: a compressed, semantically rich Reasoning Latent ... and a high-frequency Execution Latent\". [4] html: \"The resulting sequence q_res has length T/4\"; \"This yields a sequence q_exec of length T\".",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C38",
+      "claim_text": "LMR は Dual-Granularity Tokenizer により T2M-GPT 系の FID を 0.679→0.040 に改善した",
+      "citation_ids": [
+        "[4]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[4] html Table I (HumanML3D): \"T2M-GPT | 0.492±.003 | 0.679±.002 | 0.775±.002 | 0.141±.005 | 3.121±.009\" (FID column = 0.679); \"LMR(Ours) | 0.537±.005 | 0.040±.004 | 0.810±.005 | 0.040±.002\" (FID = 0.040). Table IV ablation: 1/4 reasoning + 1× execution gives FID 0.040.",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C39",
+      "claim_text": "LMR のアブレーションでは再構成最適化の潜在と整合最適化の潜在が「ほぼ直交」すると報告している",
+      "citation_ids": [
+        "[4]"
+      ],
+      "verdict": "partial",
+      "mismatch_type": "overstated",
+      "confidence": "medium",
+      "evidence": {
+        "source_excerpt": "[4] html Sec. IV-A (Analysis): \"we observe a fundamental 'Manifold Orthogonality' where latent spaces optimized for kinematic reconstruction and semantic alignment evolve into mutually exclusive topologies\"; Fig. 2 caption: \"A fundamental trade-off is observed in single-objective baselines.\"",
+        "discrepancy_note": "趣旨（再構成最適化潜在と意味整合最適化潜在の直交性）は確認できるが、(1) 記載は「アブレーション」ではなく分析節（Sec. IV-A, Fig. 2 の t-SNE 可視化）にある、(2) 原文の表現は \"Manifold Orthogonality\" / \"mutually exclusive topologies\" であり、「ほぼ直交」という定量的表現（コサイン類似度等の数値）は与えられていない。",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": "LMR の分析（Sec. IV-A, Fig. 2）では、再構成最適化の潜在空間と意味整合最適化の潜在空間が「Manifold Orthogonality」（相互排他的なトポロジー）を示すと報告している。"
+    },
+    {
+      "claim_id": "C40",
+      "claim_text": "SeMoCo は既存トークナイザが「再構成残差の順に」コードブックを組織しており意味と運動学が同じ階層に混在すると批判した",
+      "citation_ids": [
+        "[5]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[5] html: \"Most motion tokenizers nevertheless optimize VQ/RVQ representations primarily for reconstruction, organizing later codebooks by successive reconstruction residuals rather than explicit motion semantics\". [5] abs: \"Action-level meaning and fine-grained kinematic detail must therefore be encoded through the same reconstruction-driven hierarchy.\"",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C41",
+      "claim_text": "SeMoCo は TMR エンコーダと窓単位で整合させた semantic VQ と 15 段の kinematic RVQ を並列化した",
+      "citation_ids": [
+        "[5]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[5] html: \"We therefore supervise the primary code stream at the window level.\" ... \"let Φ_TMR be the frozen motion encoder from TMR\"; \"the first code is produced by a semantic vector-quantization branch and the other 15 codes by a kinematic residual vector quantizer\"; \"SeMoCo instead separates the two roles into parallel quantization paths: a single vector quantizer for semantic information and an independent residual vector quantizer for kinematic reconstruction.\"",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C42",
+      "claim_text": "SeMoCo の意味監督は MPJPE を約 2 mm 悪化させる代わりに R@1 を 0.319→0.484 に改善する",
+      "citation_ids": [
+        "[5]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[5] html Table 5 (TMR-SOMA Overall, matched 150M generators): split-branch with semantic supervision MPJPE-77 15.93 mm vs 13.70 mm without (+2.23 mm); R@1 0.484 vs 0.319 without. \"Split-branch RVQ with semantic supervision obtains the lowest FID (.186) and highest mean R@1 (.484)\".",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C43",
+      "claim_text": "SALAD は関節・フレーム・単語の関係を専用 cross-attention で明示的にモデル化し、生成時の cross-attention マップを使ったゼロショット編集を実現する",
+      "citation_ids": [
+        "[39]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "\"we introduce a skeleton-aware latent diffusion (SALAD), a model that explicitly captures the intricate inter-relationships between joints, frames, and words. Furthermore, by leveraging cross-attention maps produced during the generation process, we enable attention-based zero-shot text-driven motion editing using a pre-trained SALAD model, requiring no additional user input beyond text prompts.\"",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C44",
+      "claim_text": "J-lens 原典は J-lens を、層 ℓ の残差 h_ℓ から最終層残差への平均ヤコビアン J_ℓ = E[∂h_final/∂h_ℓ] を下流層の代わりに用い、lens(h_ℓ) = softmax(W_U norm(J_ℓ h_ℓ)) で語彙に読み出す手法と定義する",
+      "citation_ids": [
+        "[10]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "\"For each layer ℓ, we compute J_ℓ = 𝔼_{t, t' ≥ t, prompt} [∂h_final,t'/∂h_ℓ,t]\" / \"lens(h_ℓ) = softmax(W_U norm(J_ℓ h_ℓ))\"",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "snippet"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C45",
+      "claim_text": "Alibaba の数学的分析の Qwen3-8B での検証では、ヤコビアンのエネルギーは層が深いほど対角付近（短い予測ホライズン）と少数の「ブロードキャスト起点」位置（スパース概念）に集中する",
+      "citation_ids": [
+        "[11]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "medium",
+      "evidence": {
+        "source_excerpt": "\"We utilized Qwen3-8B...in the experiments.\" / \"energy decays with depth\" / \"the diagonal pattern (t≈t′)\" plus \"horizontal or vertical pattern\" at critical positions / \"a small number of pairs carry most of the total energy\" / abstract: \"decomposes into diagonal pathways and specific critical positions ... short-horizon and sparse concept predictions\"",
+        "discrepancy_note": "Qwen3-8B、対角パターン（短ホライズン）、少数の重要位置（スパース概念）への集中は確認。「ブロードキャスト起点」という語は原典では「critical positions」であり、レポート側の意訳。「層が深いほど対角付近に集中」については原典は「energy decays with depth」と述べ、深さに伴う対角集中の強化は抜粋からは明示確認できず。",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C46",
+      "claim_text": "Häon らは π0-FAST（3B）と OpenVLA（7B、Llama2 系）の FFN 値ベクトルを語彙埋め込み空間に射影し、上位トークンで「fast／slow／up／high」などのニューロン群を kNN でクラスタリングした",
+      "citation_ids": [
+        "[25]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "\"the 3B-parameter π0−FAST VLA on a real robot\" / \"All simulation experiments use the 7B-parameter OpenVLA model\" / \"OpenVLA's Llama2-7B base VLM\" / \"we can assign semantic meanings to value vectors based on the set of tokens to which they assign the highest probability\" (concepts: fast, slow, up, down, left, right, low, high) / \"identified by grouping neurons with similar token projections...either manually or via kNN over semantic embeddings\"",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C47",
+      "claim_text": "MusicGen の SAE 解析は無条件生成に限定され、テキスト条件付き活性の分離は今後の課題とされている",
+      "citation_ids": [
+        "[13]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "\"Note: we use unconditional audio; see Appendix E for more details.\" / \"Our primary focus in this work was to analyze the musical representations that emerge without text conditioning.\" / \"We see text-conditioned analysis as a valuable future direction, but our findings suggest that it is not tractable under current conditions.\"",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C48",
+      "claim_text": "Represented but Ignored は 4 つの音声 LLM（Qwen2.5-Omni-7B、Phi-4-multimodal、Audio-Flamingo-3、DeSTA2.5-Audio）を対象としている",
+      "citation_ids": [
+        "[14]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "\"Across four understanding-only audio-LLMs\" / \"Qwen2.5-Omni-7B, Phi-4-multimodal-instruct (Phi-4-MM), Audio-Flamingo-3, and DeSTA2.5-Audio\"",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C49",
+      "claim_text": "MoCHA は GPT-5.2 または蒸留した FlanT5-base で回復可能意味 s に正準化したキャプションを主信号、原文を正則化に使う blend training を行う",
+      "citation_ids": [
+        "[27]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "Abstract: \"two learned variants: an LLM-based approach (GPT-5.2) and a distilled FlanT5 model\". HTML: \"we train a FlanT5-base model on pairs {(t, C(t))} generated by the LLM\"; blend loss λ·L_InfoNCE({(m_i, C(t_i))}) + (1−λ)·L_InfoNCE({(m_i, t_i)}); \"the denoised C(t_i) anchors embeddings around s to reduce gradient variance, while the original t_i regularizes for natural-language queries\"; default strategy Blend-Rev.",
+        "discrepancy_note": "",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C50",
+      "claim_text": "RoleMotion は「座位／立位、部位の左右、移動方向を明示する」注釈規約と Transformer ベース評価器を提供する",
+      "citation_ids": [
+        "[42]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "HTML: \"all the text descriptions are fine-grained, that body states like sitting and standing, the side of part and the moving direction are required to be explicitly specified\"; evaluator: \"training a transformer-based motion and text encoders on our dataset of fine-grained textual annotation and high-quality motion sequences\" (text encoders DistilBERT/MPNet, InfoNCE contrastive training).",
+        "discrepancy_note": "",
+        "fetch_status": "success",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    },
+    {
+      "claim_id": "C51",
+      "claim_text": "ScaMo は CVPR 2025 で発表された自己回帰 LLM 型 T2M である",
+      "citation_ids": [
+        "[2]"
+      ],
+      "verdict": "match",
+      "mismatch_type": "none",
+      "confidence": "high",
+      "evidence": {
+        "source_excerpt": "[2] abs/html には会議名の記載なし（arXiv:2412.14559v1, 19 Dec 2024）。CVPR Open Access: \"ScaMo: Exploring the Scaling Law in Autoregressive Motion Generation Model\", CVPR 2025, pp. 27872-27882 (openaccess.thecvf.com/content/CVPR2025/html/Lu_ScaMo_..._CVPR_2025_paper.html). 自己回帰性は abs の \"text-prefix autoregressive transformer\" で確認。",
+        "discrepancy_note": "引用先の arXiv ページ自体には CVPR 2025 の記載がなく、CVPR 2025 Open Access ページ（Web 検索で特定）で確認した。",
+        "fetch_status": "cached",
+        "evidence_depth": "fullpage"
+      },
+      "suggested_correction": ""
+    }
+  ],
+  "source_fetch_log": [
+    {
+      "citation_id": "[1]",
+      "url": "https://arxiv.org/abs/2507.07095",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[1]",
+      "url": "https://arxiv.org/html/2507.07095",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[2]",
+      "url": "https://arxiv.org/abs/2412.14559",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[2]",
+      "url": "https://arxiv.org/html/2412.14559",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[2]",
+      "url": "https://openaccess.thecvf.com/content/CVPR2025/html/Lu_ScaMo_Exploring_the_Scaling_Law_in_Autoregressive_Motion_Generation_Model_CVPR_2025_paper.html",
+      "fetch_status": "success",
+      "http_status": 200,
+      "note": "WebSearch 結果経由で確認（C51 の会議名確認用、WebFetch は未使用）"
+    },
+    {
+      "citation_id": "[3]",
+      "url": "https://arxiv.org/abs/2512.23464",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[4]",
+      "url": "https://arxiv.org/abs/2512.24100",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[4]",
+      "url": "https://arxiv.org/html/2512.24100",
+      "fetch_status": "success",
+      "http_status": 200,
+      "note": "2 回取得（数値 0.679/0.040 の表位置と orthogonality 文言の再確認）"
+    },
+    {
+      "citation_id": "[5]",
+      "url": "https://arxiv.org/abs/2608.24334",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[5]",
+      "url": "https://arxiv.org/html/2608.24334",
+      "fetch_status": "success",
+      "http_status": 200,
+      "note": "2 回取得（window-level alignment と RVQ 段数の再確認）"
+    },
+    {
+      "citation_id": "[6]",
+      "url": "https://arxiv.org/abs/2410.18977",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[6]",
+      "url": "https://arxiv.org/html/2410.18977",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[7]",
+      "url": "https://arxiv.org/abs/2405.01461",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[7]",
+      "url": "https://arxiv.org/html/2405.01461",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[8]",
+      "url": "https://arxiv.org/abs/2503.18674",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[8]",
+      "url": "https://arxiv.org/html/2503.18674",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[9]",
+      "url": "https://arxiv.org/abs/2406.11624",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[9]",
+      "url": "https://arxiv.org/html/2406.11624",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[10]",
+      "url": "https://transformer-circuits.pub/2026/workspace",
+      "fetch_status": "success",
+      "http_status": 200,
+      "note": "同一URLを offset 0 / 100000 / 200000 の3回に分けて取得（本文 336,085 文字）"
+    },
+    {
+      "citation_id": "[11]",
+      "url": "https://arxiv.org/abs/2608.25347",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[11]",
+      "url": "https://arxiv.org/html/2608.25347",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[12]",
+      "url": "https://arxiv.org/abs/2605.17204",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[12]",
+      "url": "https://arxiv.org/html/2605.17204",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[13]",
+      "url": "https://arxiv.org/abs/2505.18186",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[13]",
+      "url": "https://arxiv.org/html/2505.18186",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[14]",
+      "url": "https://arxiv.org/abs/2608.19211",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[14]",
+      "url": "https://arxiv.org/html/2608.19211",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[15]",
+      "url": "https://arxiv.org/abs/2602.13751",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[16]",
+      "url": "https://arxiv.org/abs/2411.16575",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[17]",
+      "url": "https://arxiv.org/abs/2503.15451",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[19]",
+      "url": "https://arxiv.org/abs/2601.00590",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[20]",
+      "url": "https://arxiv.org/abs/2603.09611",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[20]",
+      "url": "https://arxiv.org/html/2603.09611",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[21]",
+      "url": "https://arxiv.org/abs/2601.10909",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[22]",
+      "url": "https://arxiv.org/abs/2411.15472",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[23]",
+      "url": "https://arxiv.org/abs/2309.10248",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[23]",
+      "url": "https://arxiv.org/html/2309.10248",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[25]",
+      "url": "https://arxiv.org/abs/2509.00328",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[25]",
+      "url": "https://arxiv.org/html/2509.00328",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[26]",
+      "url": "https://arxiv.org/abs/2606.10029",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[27]",
+      "url": "https://arxiv.org/abs/2603.23684",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[27]",
+      "url": "https://arxiv.org/html/2603.23684",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[30]",
+      "url": "https://arxiv.org/abs/2505.09379",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[31]",
+      "url": "https://arxiv.org/abs/2506.03191",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[31]",
+      "url": "https://arxiv.org/html/2506.03191",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[32]",
+      "url": "https://arxiv.org/abs/2507.05419",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[32]",
+      "url": "https://arxiv.org/html/2507.05419",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[33]",
+      "url": "https://github.com/VankouF/MotionMillion-Codes",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[34]",
+      "url": "https://arxiv.org/abs/2410.03311",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[39]",
+      "url": "https://arxiv.org/abs/2503.13836",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[42]",
+      "url": "https://arxiv.org/abs/2512.01582",
+      "fetch_status": "success",
+      "http_status": 200
+    },
+    {
+      "citation_id": "[42]",
+      "url": "https://arxiv.org/html/2512.01582",
+      "fetch_status": "success",
+      "http_status": 200
+    }
+  ]
+}

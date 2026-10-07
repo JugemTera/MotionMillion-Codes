@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0",
+  "report_path": "docs/research/text-to-motion-interpretability-survey.md",
+  "decision_intent": "learning_only",
+  "scope": "standard",
+  "iteration": 2,
+  "overall_verdict": "passed_with_notes",
+  "checks": [
+    {
+      "check_id": "self_containment",
+      "verdict": "notes",
+      "previous_violations_resolved": 5,
+      "violations": [
+        {
+          "location": "## キーファインディングス > Q4 > 「J-lens は全層（0/11, 1/23）で logit lens に負け」および ## 実例・ケーススタディ > 「GPT-2 で全層敗北」",
+          "issue": "「全層で負け／全層敗北」という要約と、§5.1 の「J-lens が logit lens に勝った層は 0/11 と 1/23」（medium では 1 層勝っている）が MD 内で整合しておらず、読者が数値と文言のどちらを信じるべきか判断できない。",
+          "suggested_fix": "「ほぼ全層で logit lens に負け（勝った層は small 0/11・medium 1/23）」のように、§5.1 の数値に合わせて Q4 と実例表の文言を揃える。"
+        }
+      ]
+    },
+    {
+      "check_id": "symbol_unit_definition",
+      "verdict": "notes",
+      "previous_violations_resolved": 7,
+      "violations": [
+        {
+          "location": "## 主要トピック解説 > ### 0. 定義表 および ### 4. 指標批判 > 「Root AVE … 単位は原典から特定できず ※定義/単位未確認」",
+          "issue": "前回指摘は解消済み（定義・方向・相関係数の意味が明記）だが、単位は ※定義/単位未確認 で回避しており補完が望ましい。",
+          "suggested_fix": "原典 [23] の Root AVE 定義（Average Variance Error の算出式）を確認し、単位（m^2 など）または「無次元（正規化後）」を §0 表に記入して注記を外す。特定不能なら現状維持で可。"
+        },
+        {
+          "location": "## 主要トピック解説 > ### 0. 定義表 および ### 4. 部位帰属の枠組み > 「Temporal / Spatial Coherence … 値域は原典から特定できず ※定義/単位未確認」",
+          "issue": "前回指摘は解消済み（無次元・高いほど良いと明記）だが、値域（0〜1 か、負値を取り得るか）は ※定義/単位未確認 で回避しており補完が望ましい。",
+          "suggested_fix": "原典 [20] の指標定義節を確認し、相互相関ベースなら −1〜1、経験分布整合なら 0〜1 などの値域を §0 表に記入して注記を外す。特定不能なら現状維持で可。"
+        },
+        {
+          "location": "## 主要トピック解説 > ### 5. > 5.1 > 「lens(h_ℓ) = softmax(W_U norm(J_ℓ h_ℓ)) で語彙に読み出す」",
+          "issue": "数式中の W_U と norm が本文・§0 表のどちらにも定義されておらず、基礎概念マップの「最終正規化と unembedding」との対応が読者に委ねられている。",
+          "suggested_fix": "数式直後に「W_U は unembedding 行列（残差次元×語彙サイズ）、norm は最終層の正規化（LayerNorm/RMSNorm）」と 1 句添えるか、§0 表に W_U・norm の行を追加する。"
+        },
+        {
+          "location": "## 主要トピック解説 > ### 5. > 5.3 > Represented but Ignored > 「11 セル中 8 で logit lens AUC 0.81〜1.00」「全 18 セル」「18 セル中 17」",
+          "issue": "「セル」が何の組み合わせ単位か（モデル×韻律属性タスクの実験条件か等）が定義されておらず、11・18 という母数の意味が読み取れない。",
+          "suggested_fix": "初出で「セル（モデル×韻律属性タスクの組、計 18）」のように定義する。原典 [14] から単位の構成が特定できなければ「セル（原典の実験条件単位 ※定義/単位未確認）」とする。"
+        }
+      ]
+    },
+    {
+      "check_id": "executive_summary_reliability",
+      "verdict": "pass",
+      "carried_over_from_previous": true,
+      "violations": []
+    },
+    {
+      "check_id": "no_meta_instruction_leak",
+      "verdict": "pass",
+      "previous_violations_resolved": 3,
+      "violations": []
+    }
+  ],
+  "summary": {
+    "total_checks": 4,
+    "passed": 2,
+    "failed": 0,
+    "notes": 2,
+    "total_violations": 5
+  },
+  "notes_for_caller": "前回 fail だった symbol_unit_definition の 7 件はすべて解消（うち Root AVE と Temporal/Spatial Coherence は ※定義/単位未確認 による notes 降格）。self_containment の前回 5 件・no_meta_instruction_leak の前回 3 件も解消。新規に検出した軽微な指摘は 3 件（Q4/実例表の「全層敗北」と §5.1 の 1/23 の不整合、W_U・norm 未定義、「セル」未定義）。fail は 0 件のため再委任は不要。notes の要約を「情報源の限界」へ追記することを推奨。"
+}
